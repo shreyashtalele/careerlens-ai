@@ -3,6 +3,7 @@ import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
 import aiRoutes from "./routes/ai.route.js";
+import errorHandler from "./middlewares/error.middleware.js";
 
 const app = express();
 
@@ -18,5 +19,6 @@ app.get("/api/health", (req, res) => {
     message: "CareerLens AI API is running",
   });
 });
+app.use(errorHandler);
 
 export default app;
