@@ -6,6 +6,7 @@ import aiRoutes from "./routes/ai.route.js";
 import errorHandler from "./middlewares/error.middleware.js";
 import authRoutes from "./routes/auth.route.js";
 import profileRoutes from "./routes/profile.route.js";
+import resumeRoutes from "./routes/resume.route.js";
 
 const app = express();
 
@@ -24,6 +25,7 @@ app.get("/api/health", (req, res) => {
 
 app.use("/api/auth", authRoutes);
 app.use("/api/profile", profileRoutes);
+app.use("/api/resumes", resumeRoutes);
 app.use("/api/ai", aiRoutes);
 app.use(errorHandler);
 
