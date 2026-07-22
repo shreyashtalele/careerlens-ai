@@ -5,6 +5,7 @@ import morgan from "morgan";
 import aiRoutes from "./routes/ai.route.js";
 import errorHandler from "./middlewares/error.middleware.js";
 import authRoutes from "./routes/auth.route.js";
+import profileRoutes from "./routes/profile.route.js";
 
 const app = express();
 
@@ -13,7 +14,7 @@ app.use(helmet());
 app.use(morgan("dev"));
 app.use(express.json());
 //test routes for ai , database & server
-app.use("/api/ai", aiRoutes);
+
 app.get("/api/health", (req, res) => {
   res.status(200).json({
     success: true,
@@ -22,6 +23,8 @@ app.get("/api/health", (req, res) => {
 });
 
 app.use("/api/auth", authRoutes);
+app.use("/api/profile", profileRoutes);
+app.use("/api/ai", aiRoutes);
 app.use(errorHandler);
 
 export default app;

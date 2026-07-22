@@ -9,6 +9,15 @@ export interface IUser extends Document {
   role: UserRole;
   createdAt: Date;
   updatedAt: Date;
+  phone?: string;
+  headline?: string;
+  bio?: string;
+  location?: string;
+  website?: string;
+  linkedin?: string;
+  github?: string;
+  portfolio?: string;
+  skills: string[];
   comparePassword(password: string): Promise<boolean>;
 }
 
@@ -41,6 +50,69 @@ const userSchema = new Schema<IUser>(
       type: String,
       enum: Object.values(USER_ROLES),
       default: USER_ROLES.USER,
+    },
+
+    headline: {
+      type: String,
+      trim: true,
+      maxlength: [120, "Headline cannot exceed 120 characters"],
+    },
+
+    bio: {
+      type: String,
+      trim: true,
+      maxlength: [1000, "Bio cannot exceed 1000 characters"],
+    },
+
+    phone: {
+      type: String,
+      trim: true,
+      maxlength: [20, "Phone number cannot exceed 20 characters"],
+    },
+
+    location: {
+      type: String,
+      trim: true,
+      maxlength: [100, "Location cannot exceed 100 characters"],
+    },
+
+    website: {
+      type: String,
+      trim: true,
+      maxlength: [300, "Website URL cannot exceed 300 characters"],
+    },
+
+    linkedin: {
+      type: String,
+      trim: true,
+      maxlength: [300, "LinkedIn URL cannot exceed 300 characters"],
+    },
+
+    github: {
+      type: String,
+      trim: true,
+      maxlength: [300, "GitHub URL cannot exceed 300 characters"],
+    },
+
+    portfolio: {
+      type: String,
+      trim: true,
+      maxlength: [300, "Portfolio URL cannot exceed 300 characters"],
+    },
+
+    skills: {
+      type: [
+        {
+          type: String,
+          trim: true,
+          maxlength: [50, "Each skill cannot exceed 50 characters"],
+        },
+      ],
+      default: [],
+      validate: {
+        validator: (skills: string[]) => skills.length <= 30,
+        message: "You can add a maximum of 30 skills",
+      },
     },
   },
   {
