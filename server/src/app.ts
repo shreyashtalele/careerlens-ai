@@ -8,6 +8,7 @@ import authRoutes from "./routes/auth.route.js";
 import profileRoutes from "./routes/profile.route.js";
 import resumeRoutes from "./routes/resume.route.js";
 import resumeAnalysisRouter from "./routes/resume-analysis.route.js";
+import atsAnalysisRouter from "./routes/ats-analysis.route.js";
 
 const app = express();
 
@@ -28,6 +29,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/profile", profileRoutes);
 app.use("/api/resumes", resumeRoutes);
 app.use("/api/resume-analysis", resumeAnalysisRouter);
+app.use("/api/ats", atsAnalysisRouter);
 app.use("/api/ai", aiRoutes);
 app.use(errorHandler);
 
