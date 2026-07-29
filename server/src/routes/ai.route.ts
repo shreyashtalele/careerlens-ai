@@ -4,6 +4,8 @@ import { testAI } from "../controllers/ai.controller.js";
 import { generateAIResumeReviewController } from "../controllers/ai-resume-review.controller.js";
 import validateRequest from "../middlewares/validate.middleware.js";
 import { generateAIResumeReviewSchema } from "../validators/ai-resume-review.validator.js";
+import { generateInterviewQuestionsController } from "../controllers/interview-question-generator.controller.js";
+import { generateInterviewQuestionsSchema } from "../validators/interview-question-generator.validator.js";
 
 const router = Router();
 
@@ -17,4 +19,9 @@ router.post(
   generateAIResumeReviewController,
 );
 
+router.post(
+  "/interview-questions",
+  validateRequest(generateInterviewQuestionsSchema),
+  generateInterviewQuestionsController,
+);
 export default router;
