@@ -9,6 +9,7 @@ import profileRoutes from "./routes/profile.route.js";
 import resumeRoutes from "./routes/resume.route.js";
 import resumeAnalysisRouter from "./routes/resume-analysis.route.js";
 import atsAnalysisRouter from "./routes/ats-analysis.route.js";
+import mockInterviewRoutes from "./routes/mock-interview.routes.js";
 
 const app = express();
 
@@ -31,6 +32,7 @@ app.use("/api/resumes", resumeRoutes);
 app.use("/api/resume-analysis", resumeAnalysisRouter);
 app.use("/api/ats", atsAnalysisRouter);
 app.use("/api/ai", aiRoutes);
+app.use("/api/mock-interviews", mockInterviewRoutes);
 app.use(errorHandler);
 
 export default app;
