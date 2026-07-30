@@ -26,6 +26,7 @@ const validateEnvironment = (): void => {
 export default validateEnvironment;
 
 export const environment = {
+  NODE_ENV: process.env.NODE_ENV ?? "development",
   MONGODB_URI: process.env.MONGODB_URI!,
   GEMINI_API_KEY: process.env.GEMINI_API_KEY!,
   GEMINI_MODEL: process.env.GEMINI_MODEL!,

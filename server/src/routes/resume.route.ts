@@ -10,7 +10,8 @@ import {
 } from "../controllers/resume.controller.js";
 
 import authenticate from "../middlewares/auth.middleware.js";
-import validateRequest from "../middlewares/validate.middleware.js";
+//import validateRequest from "../middlewares/validate.middleware.js";
+import handleValidationErrors from "../middlewares/express-validation.middleware.js";
 
 import {
   createResumeValidator,
@@ -22,40 +23,74 @@ const router = Router();
 
 router.use(authenticate);
 
+// router.post(
+//   "/",
+//   createResumeValidator,
+//   validateRequest,
+//   createResumeController,
+// );
+
 router.post(
   "/",
   createResumeValidator,
-  validateRequest,
+  handleValidationErrors,
   createResumeController,
 );
-
 router.get("/", getResumesController);
+
+// router.get(
+//   "/:resumeId",
+//   resumeIdValidator,
+//   validateRequest,
+//   getResumeByIdController,
+// );
+
+// router.patch(
+//   "/:resumeId",
+//   [...resumeIdValidator, ...updateResumeValidator],
+//   validateRequest,
+//   updateResumeController,
+// );
+
+// router.patch(
+//   "/:resumeId/default",
+//   resumeIdValidator,
+//   validateRequest,
+//   setDefaultResumeController,
+// );
+
+// router.delete(
+//   "/:resumeId",
+//   resumeIdValidator,
+//   validateRequest,
+//   deleteResumeController,
+// );
 
 router.get(
   "/:resumeId",
   resumeIdValidator,
-  validateRequest,
+  handleValidationErrors,
   getResumeByIdController,
 );
 
 router.patch(
   "/:resumeId",
   [...resumeIdValidator, ...updateResumeValidator],
-  validateRequest,
+  handleValidationErrors,
   updateResumeController,
 );
 
 router.patch(
   "/:resumeId/default",
   resumeIdValidator,
-  validateRequest,
+  handleValidationErrors,
   setDefaultResumeController,
 );
 
 router.delete(
   "/:resumeId",
   resumeIdValidator,
-  validateRequest,
+  handleValidationErrors,
   deleteResumeController,
 );
 

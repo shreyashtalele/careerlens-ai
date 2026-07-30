@@ -1,36 +1,37 @@
-import { body } from "express-validator";
+import { z } from "zod";
 
-export const registerValidator = [
-  body("fullName")
-    .trim()
-    .notEmpty()
-    .withMessage("Full name is required")
-    .isLength({ min: 3, max: 50 })
-    .withMessage("Full name must be between 3 and 50 characters"),
+export const registerValidator = z.object({
+  body: z.object({
+    fullName: z
+      .string()
+      .trim()
+      .min(1, "Full name is required")
+      .min(3, "Full name must be at least 3 characters")
+      .max(50, "Full name must not exceed 50 characters"),
 
-  body("email")
-    .trim()
-    .notEmpty()
-    .withMessage("Email is required")
-    .isEmail()
-    .withMessage("Please enter a valid email")
-    .normalizeEmail(),
+    email: z
+      .string()
+      .trim()
+      .min(1, "Email is required")
+      .email("Please enter a valid email")
+      .toLowerCase(),
 
-  body("password")
-    .notEmpty()
-    .withMessage("Password is required")
-    .isLength({ min: 8 })
-    .withMessage("Password must be at least 8 characters long"),
-];
+    password: z
+      .string()
+      .min(1, "Password is required")
+      .min(8, "Password must be at least 8 characters long"),
+  }),
+});
 
-export const loginValidator = [
-  body("email")
-    .trim()
-    .notEmpty()
-    .withMessage("Email is required")
-    .isEmail()
-    .withMessage("Please enter a valid email")
-    .normalizeEmail(),
+export const loginValidator = z.object({
+  body: z.object({
+    email: z
+      .string()
+      .trim()
+      .min(1, "Email is required")
+      .email("Please enter a valid email")
+      .toLowerCase(),
 
-  body("password").notEmpty().withMessage("Password is required"),
-];
+    password: z.string().min(1, "Password is required"),
+  }),
+});
