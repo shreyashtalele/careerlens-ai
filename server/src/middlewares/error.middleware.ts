@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 import { HTTP_STATUS } from "../constants/http-status.constants.js";
 import ApiError from "../utils/ApiError.js";
 
-const errorHandler: ErrorRequestHandler = (error, req, res, next) => {
+const errorHandler: ErrorRequestHandler = (error, req, res, _next) => {
   let statusCode: number = HTTP_STATUS.INTERNAL_SERVER_ERROR;
 
   let message = "Internal server error";

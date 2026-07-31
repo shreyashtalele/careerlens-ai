@@ -121,7 +121,7 @@ export const updateResume = async (
   resumeId: string,
   resumeData: UpdateResumeInput,
 ) => {
-  const resume = await getOwnedResume(payload.userId, resumeId);
+  const resume = await getOwnedResume(resumeId, payload.userId);
 
   if (resumeData.title !== undefined) {
     const trimmedTitle = resumeData.title.trim();

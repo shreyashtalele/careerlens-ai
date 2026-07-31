@@ -1,19 +1,11 @@
-import gemini from "../config/gemini.config.js";
+import { generateAITextResponse } from "./ai.service.js";
 
 const generateTestMessage = async (): Promise<string> => {
-  const model = process.env.GEMINI_MODEL;
-
-  if (!model) {
-    throw new Error("GEMINI_MODEL is missing");
-  }
-
-  const response = await gemini.models.generateContent({
-    model,
-    contents:
+  return generateAITextResponse({
+    prompt:
       "Reply with one short sentence confirming that Gemini is connected to CareerLens AI.",
+    temperature: 0.1,
   });
-
-  return response.text || "Gemini returned an empty response";
 };
 
 export default generateTestMessage;
