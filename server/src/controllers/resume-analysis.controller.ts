@@ -28,6 +28,7 @@ export const uploadResumeController = async (
 
     return res.status(HTTP_STATUS.OK).json({
       success: true,
+      statusCode: HTTP_STATUS.OK,
       message: RESUME_ANALYSIS_MESSAGES.RESUME_UPLOADED_SUCCESSFULLY,
       data: result,
     });

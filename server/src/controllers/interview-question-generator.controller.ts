@@ -14,6 +14,7 @@ export async function generateInterviewQuestionsController(
 
     res.status(HTTP_STATUS.OK).json({
       success: true,
+      statusCode: HTTP_STATUS.OK,
       message: INTERVIEW_QUESTION_GENERATOR_MESSAGES.GENERATED_SUCCESSFULLY,
       data: interviewQuestions,
     });

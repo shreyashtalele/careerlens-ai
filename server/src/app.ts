@@ -9,6 +9,7 @@ import profileRoutes from "./routes/profile.route.js";
 import resumeRoutes from "./routes/resume.route.js";
 import resumeAnalysisRouter from "./routes/resume-analysis.route.js";
 import atsAnalysisRouter from "./routes/ats-analysis.route.js";
+import docsRoutes from "./routes/docs.route.js";
 
 const app = express();
 
@@ -16,7 +17,8 @@ app.use(cors());
 app.use(helmet());
 app.use(morgan("dev"));
 app.use(express.json());
-//test routes for ai , database & server
+
+//test routes for database & server
 
 app.get("/api/health", (req, res) => {
   res.status(200).json({
@@ -24,6 +26,8 @@ app.get("/api/health", (req, res) => {
     message: "CareerLens AI API is running",
   });
 });
+
+app.use("/api", docsRoutes);
 
 app.use("/api/auth", authRoutes);
 app.use("/api/profile", profileRoutes);

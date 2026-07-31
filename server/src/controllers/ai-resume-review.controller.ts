@@ -22,6 +22,7 @@ export const generateAIResumeReviewController = async (
 
     return res.status(HTTP_STATUS.OK).json({
       success: true,
+      statusCode: HTTP_STATUS.OK,
       message: AI_RESUME_REVIEW_MESSAGES.GENERATED_SUCCESSFULLY,
       data: review,
     });

@@ -19,6 +19,7 @@ export const analyzeResumeController = async (
 
     return res.status(HTTP_STATUS.OK).json({
       success: true,
+      statusCode: HTTP_STATUS.OK,
       message: ATS_ANALYSIS_MESSAGES.RESUME_PARSED_SUCCESSFULLY,
       data: result,
     });
@@ -40,6 +41,7 @@ export const analyzeResumeWithJobDescriptionController = async (
 
     return res.status(HTTP_STATUS.OK).json({
       success: true,
+      statusCode: HTTP_STATUS.OK,
       message: ATS_ANALYSIS_MESSAGES.RESUME_PARSED_SUCCESSFULLY,
       data: result,
     });

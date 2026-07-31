@@ -10,18 +10,20 @@ import {
   analyzeResumeWithJobDescriptionSchema,
 } from "../validators/ats-analysis.validator.js";
 
+import authenticate from "../middlewares/auth.middleware.js";
 const atsAnalysisRouter = Router();
 
 atsAnalysisRouter.post(
   "/analyze",
+  authenticate,
   validateRequest(analyzeResumeSchema),
   analyzeResumeController,
 );
 
 atsAnalysisRouter.post(
   "/analyze-with-job-description",
+  authenticate,
   validateRequest(analyzeResumeWithJobDescriptionSchema),
   analyzeResumeWithJobDescriptionController,
 );
-
 export default atsAnalysisRouter;

@@ -60,7 +60,10 @@ export const loginUser = async (loginData: LoginUserInput) => {
   const isPasswordCorrect = await user.comparePassword(password);
 
   if (!isPasswordCorrect) {
-    throw new ApiError(HTTP_STATUS.NOT_FOUND, AUTH_MESSAGES.USER_NOT_FOUND);
+    throw new ApiError(
+      HTTP_STATUS.UNAUTHORIZED,
+      AUTH_MESSAGES.INVALID_CREDENTIALS,
+    );
   }
 
   const token = generateToken({

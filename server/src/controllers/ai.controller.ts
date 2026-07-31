@@ -1,22 +1,24 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
+
+import { HTTP_STATUS } from "../constants/http-status.constants.js";
 import generateTestMessage from "../services/gemini.service.js";
 
-const testAI = async (req: Request, res: Response): Promise<void> => {
+const testAI = async (
+  _req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> => {
   try {
     const message = await generateTestMessage();
 
-    res.status(200).json({
+    res.status(HTTP_STATUS.OK).json({
       success: true,
+      statusCode: HTTP_STATUS.OK,
       message,
+      data: null,
     });
   } catch (error) {
-    const errorMessage =
-      error instanceof Error ? error.message : "Something went wrong";
-
-    res.status(500).json({
-      success: false,
-      message: errorMessage,
-    });
+    next(error);
   }
 };
 
