@@ -25,7 +25,7 @@ export function useAuth() {
     setError(null);
     try {
       const response = await axios.post(`${API_URL}/auth/register`, {
-        fullName: data.name, // ← Backend expects 'fullName'
+        fullName: data.name,
         email: data.email,
         password: data.password,
       });
@@ -49,7 +49,15 @@ export function useAuth() {
         password: data.password,
       });
       console.log("Login successful:", response.data);
-      localStorage.setItem("token", response.data.data.token);
+
+      // Store token
+      const token = response.data.data.token;
+      localStorage.setItem("token", token);
+
+      // Store user data
+      const user = response.data.data.user;
+      localStorage.setItem("user", JSON.stringify(user));
+
       navigate("/dashboard");
     } catch (err: any) {
       const message = err.response?.data?.message || "Login failed";
@@ -62,6 +70,7 @@ export function useAuth() {
 
   const logout = () => {
     localStorage.removeItem("token");
+    localStorage.removeItem("user");
     navigate("/login");
   };
 
