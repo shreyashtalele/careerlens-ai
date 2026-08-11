@@ -1,41 +1,45 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useProfile } from "@/hooks/useProfile";
+import { useFormWithValidation } from "@/hooks/useFormWithValidation";
+import { profileSchema, ProfileFormData } from "@/lib/validations";
 
 export default function Profile() {
   const { profile, isLoading, updateProfile, deleteAccount } = useProfile();
   const [isEditing, setIsEditing] = useState(false);
-  const [formData, setFormData] = useState({
-    headline: "",
-    bio: "",
-    location: "",
-    phone: "",
-    website: "",
-    github: "",
-    linkedin: "",
-  });
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deletePassword, setDeletePassword] = useState("");
 
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+    setValue,
+  } = useFormWithValidation(profileSchema);
+
   // Load profile data into form when editing
+  useEffect(() => {
+    if (profile && isEditing) {
+      setValue("headline", profile.headline || "");
+      setValue("bio", profile.bio || "");
+      setValue("location", profile.location || "");
+      setValue("phone", profile.phone || "");
+      setValue("website", profile.website || "");
+      setValue("github", profile.github || "");
+      setValue("linkedin", profile.linkedin || "");
+      setValue("portfolio", profile.portfolio || "");
+    }
+  }, [profile, isEditing, setValue]);
+
   const startEditing = () => {
     if (profile) {
-      setFormData({
-        headline: profile.headline || "",
-        bio: profile.bio || "",
-        location: profile.location || "",
-        phone: profile.phone || "",
-        website: profile.website || "",
-        github: profile.github || "",
-        linkedin: profile.linkedin || "",
-      });
       setIsEditing(true);
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const onSubmit = async (data: ProfileFormData) => {
     try {
-      await updateProfile(formData);
+      await updateProfile(data);
       setIsEditing(false);
     } catch (err) {
       // Error handled by hook
@@ -46,7 +50,6 @@ export default function Profile() {
     e.preventDefault();
     try {
       await deleteAccount(deletePassword);
-      // Redirect to login
       window.location.href = "/login";
     } catch (err) {
       // Error handled by hook
@@ -78,7 +81,6 @@ export default function Profile() {
       {!isEditing ? (
         // View Mode
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-6">
-          {/* Basic Info */}
           <div>
             <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wider">
               About
@@ -86,7 +88,6 @@ export default function Profile() {
             <p className="mt-2 text-gray-700">{profile?.bio || "No bio yet"}</p>
           </div>
 
-          {/* Headline & Location */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wider">
@@ -106,28 +107,6 @@ export default function Profile() {
             </div>
           </div>
 
-          {/* Skills */}
-          <div>
-            <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wider">
-              Skills
-            </h3>
-            <div className="mt-2 flex flex-wrap gap-2">
-              {profile?.skills && profile.skills.length > 0 ? (
-                profile.skills.map((skill, i) => (
-                  <span
-                    key={i}
-                    className="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-sm"
-                  >
-                    {skill}
-                  </span>
-                ))
-              ) : (
-                <span className="text-gray-400 text-sm">No skills added</span>
-              )}
-            </div>
-          </div>
-
-          {/* Contact */}
           <div>
             <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wider">
               Contact
@@ -137,7 +116,6 @@ export default function Profile() {
             </p>
           </div>
 
-          {/* Links */}
           <div>
             <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wider">
               Links
@@ -182,7 +160,6 @@ export default function Profile() {
             </div>
           </div>
 
-          {/* Delete Account */}
           <div className="pt-6 border-t border-red-100">
             <button
               onClick={() => setShowDeleteConfirm(true)}
@@ -195,7 +172,7 @@ export default function Profile() {
       ) : (
         // Edit Mode
         <form
-          onSubmit={handleSubmit}
+          onSubmit={handleSubmit(onSubmit)}
           className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-4"
         >
           <div>
@@ -204,13 +181,17 @@ export default function Profile() {
             </label>
             <input
               type="text"
-              value={formData.headline}
-              onChange={(e) =>
-                setFormData({ ...formData, headline: e.target.value })
-              }
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              {...register("headline")}
+              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                errors.headline ? "border-red-500" : "border-gray-300"
+              }`}
               placeholder="e.g., Senior Software Engineer"
             />
+            {errors.headline && (
+              <p className="mt-1 text-sm text-red-600">
+                {errors.headline.message}
+              </p>
+            )}
           </div>
 
           <div>
@@ -218,14 +199,16 @@ export default function Profile() {
               Bio
             </label>
             <textarea
-              value={formData.bio}
-              onChange={(e) =>
-                setFormData({ ...formData, bio: e.target.value })
-              }
+              {...register("bio")}
               rows={3}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                errors.bio ? "border-red-500" : "border-gray-300"
+              }`}
               placeholder="Tell us about yourself"
             />
+            {errors.bio && (
+              <p className="mt-1 text-sm text-red-600">{errors.bio.message}</p>
+            )}
           </div>
 
           <div>
@@ -234,13 +217,17 @@ export default function Profile() {
             </label>
             <input
               type="text"
-              value={formData.location}
-              onChange={(e) =>
-                setFormData({ ...formData, location: e.target.value })
-              }
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              {...register("location")}
+              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                errors.location ? "border-red-500" : "border-gray-300"
+              }`}
               placeholder="e.g., San Francisco, CA"
             />
+            {errors.location && (
+              <p className="mt-1 text-sm text-red-600">
+                {errors.location.message}
+              </p>
+            )}
           </div>
 
           <div>
@@ -249,13 +236,17 @@ export default function Profile() {
             </label>
             <input
               type="text"
-              value={formData.phone}
-              onChange={(e) =>
-                setFormData({ ...formData, phone: e.target.value })
-              }
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              {...register("phone")}
+              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                errors.phone ? "border-red-500" : "border-gray-300"
+              }`}
               placeholder="+1 234 567 8900"
             />
+            {errors.phone && (
+              <p className="mt-1 text-sm text-red-600">
+                {errors.phone.message}
+              </p>
+            )}
           </div>
 
           <div>
@@ -264,13 +255,17 @@ export default function Profile() {
             </label>
             <input
               type="url"
-              value={formData.website}
-              onChange={(e) =>
-                setFormData({ ...formData, website: e.target.value })
-              }
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              {...register("website")}
+              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                errors.website ? "border-red-500" : "border-gray-300"
+              }`}
               placeholder="https://yourwebsite.com"
             />
+            {errors.website && (
+              <p className="mt-1 text-sm text-red-600">
+                {errors.website.message}
+              </p>
+            )}
           </div>
 
           <div>
@@ -279,13 +274,17 @@ export default function Profile() {
             </label>
             <input
               type="url"
-              value={formData.github}
-              onChange={(e) =>
-                setFormData({ ...formData, github: e.target.value })
-              }
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              {...register("github")}
+              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                errors.github ? "border-red-500" : "border-gray-300"
+              }`}
               placeholder="https://github.com/username"
             />
+            {errors.github && (
+              <p className="mt-1 text-sm text-red-600">
+                {errors.github.message}
+              </p>
+            )}
           </div>
 
           <div>
@@ -294,13 +293,17 @@ export default function Profile() {
             </label>
             <input
               type="url"
-              value={formData.linkedin}
-              onChange={(e) =>
-                setFormData({ ...formData, linkedin: e.target.value })
-              }
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              {...register("linkedin")}
+              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                errors.linkedin ? "border-red-500" : "border-gray-300"
+              }`}
               placeholder="https://linkedin.com/in/username"
             />
+            {errors.linkedin && (
+              <p className="mt-1 text-sm text-red-600">
+                {errors.linkedin.message}
+              </p>
+            )}
           </div>
 
           <div className="flex gap-3 pt-4">
@@ -312,7 +315,10 @@ export default function Profile() {
             </button>
             <button
               type="button"
-              onClick={() => setIsEditing(false)}
+              onClick={() => {
+                setIsEditing(false);
+                reset();
+              }}
               className="px-4 py-2 text-sm font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
             >
               Cancel
