@@ -1,10 +1,6 @@
 import { useState, useEffect } from "react";
-import {
-  resumeApi,
-  Resume,
-  CreateResumeData,
-  UpdateResumeData,
-} from "@/api/resume";
+import { resumeApi } from "@/api/resume";
+import { Resume, CreateResumeData } from "@/types/models";
 
 export function useResume() {
   const [resumes, setResumes] = useState<Resume[]>([]);
@@ -27,20 +23,37 @@ export function useResume() {
   };
 
   // Load single resume
+  // Load single resume
   const loadResume = async (id: string) => {
     setIsLoading(true);
     setError(null);
     try {
+      const token = localStorage.getItem("token");
+      console.log("loadResume - Token exists?", !!token);
+      console.log("loadResume - Resume ID:", id);
+
       const data = await resumeApi.getResume(id);
+      console.log("loadResume - Data received:", data);
       setSelectedResume(data);
     } catch (err: any) {
-      setError(err.response?.data?.message || "Failed to load resume");
+      console.error("loadResume - Error:", err);
+      console.error("loadResume - Response:", err.response);
+
+      const message =
+        err.response?.data?.message || err.message || "Failed to load resume";
+      setError(message);
+
+      // If 401, redirect to login (handled by interceptor)
+      // If 404, show not found
+      if (err.response?.status === 404) {
+        setError("Resume not found");
+      }
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Create resume - ADDED
+  // Create resume
   const createResume = async (data: CreateResumeData) => {
     setError(null);
     try {
@@ -54,7 +67,7 @@ export function useResume() {
   };
 
   // Update resume
-  const updateResume = async (id: string, data: UpdateResumeData) => {
+  const updateResume = async (id: string, data: Partial<CreateResumeData>) => {
     setError(null);
     try {
       const updated = await resumeApi.updateResume(id, data);
@@ -88,16 +101,13 @@ export function useResume() {
   const setDefault = async (id: string) => {
     setError(null);
     try {
-      const updated = await resumeApi.setDefaultResume(id);
+      await resumeApi.setDefaultResume(id);
       setResumes(
         resumes.map((r) => ({
           ...r,
           isDefault: r.id === id,
         })),
       );
-      if (selectedResume?.id === id) {
-        setSelectedResume(updated);
-      }
     } catch (err: any) {
       setError(err.response?.data?.message || "Failed to set default resume");
       throw err;
@@ -116,7 +126,7 @@ export function useResume() {
     error,
     loadResumes,
     loadResume,
-    createResume, // ← Make sure this is exported
+    createResume,
     updateResume,
     deleteResume,
     setDefault,
