@@ -4,6 +4,7 @@ import { useResume } from "@/hooks/useResume";
 import { ResumeView } from "@/components/resume/ResumeView";
 import { ResumeForm } from "@/components/resume/ResumeForm";
 import { Resume } from "@/types/models";
+import { ResumeDetailSkeleton } from "@/components/resume/ResumeSkeleton";
 
 export default function ResumeDetail() {
   const { id } = useParams<{ id: string }>();
@@ -61,11 +62,7 @@ export default function ResumeDetail() {
   };
 
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-      </div>
-    );
+    return <ResumeDetailSkeleton />;
   }
 
   if (error) {

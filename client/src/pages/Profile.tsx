@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useProfile } from "@/hooks/useProfile";
 import { useFormWithValidation } from "@/hooks/useFormWithValidation";
 import { profileSchema, ProfileFormData } from "@/lib/validations";
+import { ProfileSkeleton } from "@/components/comman";
 
 export default function Profile() {
   const { profile, isLoading, updateProfile, deleteAccount } = useProfile();
@@ -57,11 +58,7 @@ export default function Profile() {
   };
 
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-      </div>
-    );
+    return <ProfileSkeleton />;
   }
 
   return (

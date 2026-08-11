@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useResume } from "@/hooks/useResume";
 import { useNavigate } from "react-router-dom";
+import { ResumeListSkeleton } from "@/components/resume/ResumeSkeleton";
 
 export default function Resumes() {
   // Add 'createResume' here ↓↓↓
@@ -67,11 +68,7 @@ export default function Resumes() {
   };
 
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-      </div>
-    );
+    return <ResumeListSkeleton />;
   }
 
   return (

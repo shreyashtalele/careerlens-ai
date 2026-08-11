@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useFormWithValidation } from "@/hooks/useFormWithValidation";
 import { registerSchema, RegisterFormData } from "@/lib/validations";
+import { ARIALabel, ARIAMessage } from "@/components/comman";
 
 export default function Register() {
   const { register: registerUser, isLoading, error } = useAuth();
@@ -16,7 +17,12 @@ export default function Register() {
   } = useFormWithValidation(registerSchema);
 
   const onSubmit = (data: RegisterFormData) => {
-    registerUser(data);
+    // Map name to fullName for API
+    registerUser({
+      fullName: data.name,
+      email: data.email,
+      password: data.password,
+    });
   };
 
   return (
@@ -42,20 +48,16 @@ export default function Register() {
 
         <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
           {error && (
-            <div className="bg-red-50 border border-red-400 text-red-700 px-4 py-3 rounded-lg text-sm">
+            <div
+              className="bg-red-50 border border-red-400 text-red-700 px-4 py-3 rounded-lg text-sm"
+              role="alert"
+            >
               {error}
             </div>
           )}
 
           <div className="space-y-4">
-            {/* Full Name */}
-            <div>
-              <label
-                htmlFor="name"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
-                Full Name
-              </label>
+            <ARIALabel id="name" label="Full Name" required>
               <input
                 id="name"
                 type="text"
@@ -66,22 +68,14 @@ export default function Register() {
                 placeholder="John Doe"
                 disabled={isLoading}
                 aria-invalid={errors.name ? "true" : "false"}
+                aria-describedby={errors.name ? "name-error" : undefined}
               />
               {errors.name && (
-                <p className="mt-1 text-sm text-red-600">
-                  {errors.name.message}
-                </p>
+                <ARIAMessage id="name-error" message={errors.name.message} />
               )}
-            </div>
+            </ARIALabel>
 
-            {/* Email */}
-            <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
-                Email address
-              </label>
+            <ARIALabel id="email" label="Email address" required>
               <input
                 id="email"
                 type="email"
@@ -92,22 +86,14 @@ export default function Register() {
                 placeholder="you@example.com"
                 disabled={isLoading}
                 aria-invalid={errors.email ? "true" : "false"}
+                aria-describedby={errors.email ? "email-error" : undefined}
               />
               {errors.email && (
-                <p className="mt-1 text-sm text-red-600">
-                  {errors.email.message}
-                </p>
+                <ARIAMessage id="email-error" message={errors.email.message} />
               )}
-            </div>
+            </ARIALabel>
 
-            {/* Password */}
-            <div>
-              <label
-                htmlFor="password"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
-                Password
-              </label>
+            <ARIALabel id="password" label="Password" required>
               <div className="relative">
                 <input
                   id="password"
@@ -119,6 +105,9 @@ export default function Register() {
                   placeholder="Min 8 characters with uppercase, lowercase, number"
                   disabled={isLoading}
                   aria-invalid={errors.password ? "true" : "false"}
+                  aria-describedby={
+                    errors.password ? "password-error" : undefined
+                  }
                 />
                 <button
                   type="button"
@@ -130,20 +119,14 @@ export default function Register() {
                 </button>
               </div>
               {errors.password && (
-                <p className="mt-1 text-sm text-red-600">
-                  {errors.password.message}
-                </p>
+                <ARIAMessage
+                  id="password-error"
+                  message={errors.password.message}
+                />
               )}
-            </div>
+            </ARIALabel>
 
-            {/* Confirm Password */}
-            <div>
-              <label
-                htmlFor="confirmPassword"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
-                Confirm Password
-              </label>
+            <ARIALabel id="confirmPassword" label="Confirm Password" required>
               <div className="relative">
                 <input
                   id="confirmPassword"
@@ -157,6 +140,9 @@ export default function Register() {
                   placeholder="Confirm your password"
                   disabled={isLoading}
                   aria-invalid={errors.confirmPassword ? "true" : "false"}
+                  aria-describedby={
+                    errors.confirmPassword ? "confirm-error" : undefined
+                  }
                 />
                 <button
                   type="button"
@@ -170,17 +156,19 @@ export default function Register() {
                 </button>
               </div>
               {errors.confirmPassword && (
-                <p className="mt-1 text-sm text-red-600">
-                  {errors.confirmPassword.message}
-                </p>
+                <ARIAMessage
+                  id="confirm-error"
+                  message={errors.confirmPassword.message}
+                />
               )}
-            </div>
+            </ARIALabel>
           </div>
 
           <button
             type="submit"
             disabled={isLoading}
             className="w-full py-2 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            aria-busy={isLoading}
           >
             {isLoading ? "Creating account..." : "Create account"}
           </button>
