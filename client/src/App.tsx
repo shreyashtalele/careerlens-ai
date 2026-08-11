@@ -4,9 +4,9 @@ import { Toaster } from "sonner";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { Layout } from "@/components/Layout";
-import { PageLoading } from "@/components/comman/LoadingSpinner";
+import { PageLoading } from "@/components/comman";
 
-// Lazy load pages for better performance
+// Lazy load pages
 const Login = lazy(() => import("@/pages/Login"));
 const Register = lazy(() => import("@/pages/Register"));
 const Dashboard = lazy(() => import("@/pages/Dashboard"));
@@ -14,6 +14,8 @@ const Profile = lazy(() => import("@/pages/Profile"));
 const Resumes = lazy(() => import("@/pages/Resumes"));
 const ResumeDetail = lazy(() => import("@/pages/ResumeDetail"));
 const ResumeUpload = lazy(() => import("@/pages/ResumeUpload"));
+const AIReview = lazy(() => import("@/pages/AIReview"));
+const Interview = lazy(() => import("@/pages/Interview"));
 
 function App() {
   return (
@@ -45,6 +47,8 @@ function App() {
                 <Route path="/resumes/:id" element={<ResumeDetail />} />
                 <Route path="/upload" element={<ResumeUpload />} />
                 <Route path="/profile" element={<Profile />} />
+                <Route path="/ai-review" element={<AIReview />} />
+                <Route path="/interview" element={<Interview />} />
               </Route>
             </Route>
 

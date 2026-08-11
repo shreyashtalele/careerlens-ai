@@ -264,10 +264,80 @@ export interface InterviewQuestionsRequest {
 }
 
 export interface InterviewQuestionsResponse {
+  technicalQuestions: Array<{
+    question: string;
+    difficulty: string;
+    topic: string;
+    reason: string;
+  }>;
+  projectQuestions: Array<{
+    question: string;
+    difficulty: string;
+    topic: string;
+    reason: string;
+  }>;
+  behavioralQuestions: Array<{
+    question: string;
+    difficulty: string;
+    topic: string;
+    reason: string;
+  }>;
+  hrQuestions: Array<{
+    question: string;
+    difficulty: string;
+    topic: string;
+    reason: string;
+  }>;
+  followUpQuestions: Array<{
+    question: string;
+    difficulty: string;
+    topic: string;
+    reason: string;
+  }>;
+  preparationTips: string[];
+}
+
+// ============================================
+// AI TYPES - Add these to your api.ts
+// ============================================
+
+export interface AIReviewRequest {
+  resumeText: string;
+}
+
+export interface AIReviewResponse {
+  overallReview: string;
+  strengths: string[];
+  weaknesses: string[];
+  sectionSuggestions: {
+    summary?: string;
+    experience?: string;
+    projects?: string;
+    skills?: string;
+    education?: string;
+  };
+  recruiterFeedback: string;
+  improvedSummary: string;
+  keywordSuggestions: string[];
+  nextSteps: string[];
+}
+
+export interface InterviewQuestionsRequest {
+  resumeText: string;
+  difficulty?: "easy" | "medium" | "hard";
+  count?: number;
+}
+
+export interface InterviewQuestionsResponse {
   technical: string[];
   project: string[];
   behavioral: string[];
   hr: string[];
   followUp: string[];
   preparationTips: string[];
+}
+
+export interface AITestResponse {
+  status: string;
+  message?: string;
 }

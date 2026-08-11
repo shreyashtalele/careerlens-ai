@@ -38,6 +38,18 @@ export function Layout() {
                 Upload
               </Link>
               <Link
+                to="/ai-review"
+                className="text-sm text-gray-600 hover:text-blue-600"
+              >
+                AI Review
+              </Link>
+              <Link
+                to="/interview"
+                className="text-sm text-gray-600 hover:text-blue-600"
+              >
+                Interview
+              </Link>
+              <Link
                 to="/profile"
                 className="text-sm text-gray-600 hover:text-blue-600"
               >
