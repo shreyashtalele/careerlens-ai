@@ -1,81 +1,65 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
-
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:7000/api";
-
-interface Profile {
-  id: string;
-  userId: string;
-  headline?: string;
-  bio?: string;
-  skills?: string[];
-  phone?: string;
-  website?: string;
-  github?: string;
-  linkedin?: string;
-  portfolio?: string;
-  location?: string;
-}
+import { profileApi } from "@/api/profile";
+import { Profile, UpdateProfileData } from "@/types/models";
+import { toast } from "@/lib/toast";
+import { logError } from "@/lib/error-handler";
 
 export function useProfile() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Fetch profile
   const fetchProfile = async () => {
     setIsLoading(true);
     setError(null);
     try {
-      const token = localStorage.getItem("token");
-      const response = await axios.get(`${API_URL}/profile`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setProfile(response.data.data);
-    } catch (err: any) {
-      const message = err.response?.data?.message || "Failed to load profile";
+      const data = await profileApi.getProfile();
+      setProfile(data);
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : "Failed to load profile";
       setError(message);
-      console.error("Profile error:", err);
+      logError(err, "Fetch Profile");
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Update profile
-  const updateProfile = async (data: Partial<Profile>) => {
+  const updateProfile = async (data: UpdateProfileData) => {
     setIsLoading(true);
     setError(null);
     try {
-      const token = localStorage.getItem("token");
-      const response = await axios.patch(`${API_URL}/profile`, data, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setProfile(response.data.data);
-      return response.data;
-    } catch (err: any) {
-      const message = err.response?.data?.message || "Failed to update profile";
+      const updated = await profileApi.updateProfile(data);
+      setProfile(updated);
+      toast.success("Profile updated successfully");
+      return updated;
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : "Failed to update profile";
       setError(message);
+      toast.error(message);
+      logError(err, "Update Profile");
       throw err;
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Delete account
   const deleteAccount = async (password: string) => {
     setIsLoading(true);
     setError(null);
     try {
-      const token = localStorage.getItem("token");
-      await axios.delete(`${API_URL}/profile`, {
-        headers: { Authorization: `Bearer ${token}` },
-        data: { password },
-      });
+      await profileApi.deleteAccount(password);
+      toast.success("Account deleted successfully");
       localStorage.removeItem("token");
+      localStorage.removeItem("user");
       return true;
-    } catch (err: any) {
-      const message = err.response?.data?.message || "Failed to delete account";
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : "Failed to delete account";
       setError(message);
+      toast.error(message);
+      logError(err, "Delete Account");
       throw err;
     } finally {
       setIsLoading(false);

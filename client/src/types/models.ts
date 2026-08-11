@@ -1,4 +1,7 @@
-// User & Profile
+// ============================================
+// USER & PROFILE TYPES
+// ============================================
+
 export interface User {
   id: string;
   email: string;
@@ -22,13 +25,6 @@ export interface Profile {
   updatedAt?: string;
 }
 
-export interface ProfileResponse {
-  success: boolean;
-  statusCode: number;
-  message: string;
-  data: Profile;
-}
-
 export interface UpdateProfileData {
   headline?: string;
   bio?: string;
@@ -42,7 +38,7 @@ export interface UpdateProfileData {
 }
 
 // ============================================
-// RESUME TYPES - COMPLETE
+// RESUME TYPES
 // ============================================
 
 export interface PersonalDetails {
@@ -95,15 +91,7 @@ export interface Resume {
 
 export interface CreateResumeData {
   title: string;
-  personalDetails: {
-    fullName: string;
-    email: string;
-    phone?: string;
-    location?: string;
-    linkedin?: string;
-    github?: string;
-    website?: string;
-  };
+  personalDetails: PersonalDetails;
   summary?: string;
   skills?: string[];
   experience?: WorkExperience[];
@@ -111,72 +99,13 @@ export interface CreateResumeData {
   projects?: Project[];
 }
 
-// Resume API Response
-export interface ResumeResponse {
+// ============================================
+// PROFILE RESPONSE
+// ============================================
+
+export interface ProfileResponse {
   success: boolean;
   statusCode: number;
   message: string;
-  data: Resume | Resume[];
-}
-
-// ============================================
-// UPLOAD & ATS TYPES
-// ============================================
-
-export interface UploadResponse {
-  fileName: string;
-  fileSize: number;
-  text: string;
-  wordCount: number;
-  characterCount: number;
-}
-
-export interface ATSSection {
-  name: string;
-  content: string;
-  isPresent: boolean;
-}
-
-export interface ATSAnalysis {
-  score: number;
-  sections: ATSSection[];
-  missingSections: string[];
-  recommendations: string[];
-  extractedSkills: string[];
-}
-
-export interface ATSAnalysisWithJD extends ATSAnalysis {
-  matchPercentage: number;
-  matchedSkills: string[];
-  missingSkills: string[];
-}
-
-// ============================================
-// AI TYPES
-// ============================================
-
-export interface AIReview {
-  overallReview: string;
-  strengths: string[];
-  weaknesses: string[];
-  recruiterFeedback: string;
-  improvedSummary: string;
-  sectionSuggestions: {
-    summary?: string;
-    experience?: string;
-    projects?: string;
-    skills?: string;
-    education?: string;
-  };
-  keywordSuggestions: string[];
-  nextSteps: string[];
-}
-
-export interface InterviewQuestions {
-  technical: string[];
-  project: string[];
-  behavioral: string[];
-  hr: string[];
-  followUp: string[];
-  preparationTips: string[];
+  data: Profile;
 }

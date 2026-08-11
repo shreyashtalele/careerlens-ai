@@ -1,14 +1,18 @@
 import { useState } from "react";
+import { uploadApi } from "@/api/upload";
 import {
-  uploadApi,
-  UploadResponse,
+  UploadResumeResponse,
   ATSAnalysisResponse,
   ATSAnalysisWithJDResponse,
-} from "@/api/upload";
+} from "@/types/api";
+import { toast } from "@/lib/toast";
+import { logError } from "@/lib/error-handler";
 
 export function useUpload() {
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
-  const [uploadResult, setUploadResult] = useState<UploadResponse | null>(null);
+  const [uploadResult, setUploadResult] = useState<UploadResumeResponse | null>(
+    null,
+  );
   const [analysisResult, setAnalysisResult] =
     useState<ATSAnalysisResponse | null>(null);
   const [analysisWithJDResult, setAnalysisWithJDResult] =
@@ -17,7 +21,6 @@ export function useUpload() {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Upload resume
   const uploadResume = async (file: File) => {
     setIsUploading(true);
     setError(null);
@@ -29,34 +32,40 @@ export function useUpload() {
     try {
       const result = await uploadApi.uploadResume(file);
       setUploadResult(result);
+      toast.success("Resume uploaded successfully");
       return result;
-    } catch (err: any) {
-      const message = err.response?.data?.message || "Failed to upload resume";
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : "Failed to upload resume";
       setError(message);
+      toast.error(message);
+      logError(err, "Upload Resume");
       throw err;
     } finally {
       setIsUploading(false);
     }
   };
 
-  // ATS Analysis
   const analyzeResume = async (text: string) => {
     setIsAnalyzing(true);
     setError(null);
     try {
       const result = await uploadApi.analyzeResume(text);
       setAnalysisResult(result);
+      toast.success("Resume analyzed successfully");
       return result;
-    } catch (err: any) {
-      const message = err.response?.data?.message || "Failed to analyze resume";
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : "Failed to analyze resume";
       setError(message);
+      toast.error(message);
+      logError(err, "Analyze Resume");
       throw err;
     } finally {
       setIsAnalyzing(false);
     }
   };
 
-  // ATS Analysis with Job Description
   const analyzeWithJobDescription = async (
     text: string,
     jobDescription: string,
@@ -69,12 +78,16 @@ export function useUpload() {
         jobDescription,
       );
       setAnalysisWithJDResult(result);
+      toast.success("Resume analyzed with job description successfully");
       return result;
-    } catch (err: any) {
+    } catch (err) {
       const message =
-        err.response?.data?.message ||
-        "Failed to analyze resume with job description";
+        err instanceof Error
+          ? err.message
+          : "Failed to analyze resume with job description";
       setError(message);
+      toast.error(message);
+      logError(err, "Analyze Resume with JD");
       throw err;
     } finally {
       setIsAnalyzing(false);

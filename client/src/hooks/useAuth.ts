@@ -3,19 +3,9 @@ import { useNavigate } from "react-router-dom";
 import axios, { AxiosError } from "axios";
 import { toast } from "@/lib/toast";
 import { logError } from "@/lib/error-handler";
+import { LoginRequest, RegisterRequest, AuthResponse } from "@/types/api";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:7000/api";
-
-interface RegisterData {
-  name: string;
-  email: string;
-  password: string;
-}
-
-interface LoginData {
-  email: string;
-  password: string;
-}
 
 interface ApiErrorResponse {
   message: string;
@@ -27,17 +17,20 @@ export function useAuth() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const register = async (data: RegisterData) => {
+  const register = async (data: RegisterRequest) => {
     setIsLoading(true);
     setError(null);
     const toastId = toast.loading("Creating your account...");
 
     try {
-      const response = await axios.post(`${API_URL}/auth/register`, {
-        fullName: data.name,
-        email: data.email,
-        password: data.password,
-      });
+      const response = await axios.post<{ data: AuthResponse }>(
+        `${API_URL}/auth/register`,
+        {
+          fullName: data.fullName,
+          email: data.email,
+          password: data.password,
+        },
+      );
 
       toast.dismiss(toastId);
       toast.success("Account created successfully! Please login.");
@@ -67,19 +60,21 @@ export function useAuth() {
     }
   };
 
-  const login = async (data: LoginData) => {
+  const login = async (data: LoginRequest) => {
     setIsLoading(true);
     setError(null);
     const toastId = toast.loading("Signing in...");
 
     try {
-      const response = await axios.post(`${API_URL}/auth/login`, {
-        email: data.email,
-        password: data.password,
-      });
+      const response = await axios.post<{ data: AuthResponse }>(
+        `${API_URL}/auth/login`,
+        {
+          email: data.email,
+          password: data.password,
+        },
+      );
 
-      const token = response.data.data.token;
-      const user = response.data.data.user;
+      const { token, user } = response.data.data;
 
       localStorage.setItem("token", token);
       localStorage.setItem("user", JSON.stringify(user));

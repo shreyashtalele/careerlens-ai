@@ -1,42 +1,37 @@
-import { apiClient } from "./client";
+import { api } from "./client";
 import { Resume, CreateResumeData } from "@/types/models";
 
 export const resumeApi = {
   // Get all resumes
-  getResumes: async (): Promise<Resume[]> => {
-    const response = await apiClient.get("/resumes");
-    return response.data.data;
+  getResumes: (): Promise<Resume[]> => {
+    return api.get<Resume[]>("/resumes");
   },
 
   // Get single resume
-  getResume: async (id: string): Promise<Resume> => {
-    const response = await apiClient.get(`/resumes/${id}`);
-    return response.data.data;
+  getResume: (id: string): Promise<Resume> => {
+    return api.get<Resume>(`/resumes/${id}`);
   },
 
   // Create resume
-  createResume: async (data: CreateResumeData): Promise<Resume> => {
-    const response = await apiClient.post("/resumes", data);
-    return response.data.data;
+  createResume: (data: CreateResumeData): Promise<Resume> => {
+    return api.post<Resume>("/resumes", data);
   },
 
   // Update resume
-  updateResume: async (
+  updateResume: (
     id: string,
     data: Partial<CreateResumeData>,
   ): Promise<Resume> => {
-    const response = await apiClient.patch(`/resumes/${id}`, data);
-    return response.data.data;
+    return api.patch<Resume>(`/resumes/${id}`, data);
   },
 
   // Delete resume
-  deleteResume: async (id: string): Promise<void> => {
-    await apiClient.delete(`/resumes/${id}`);
+  deleteResume: (id: string): Promise<void> => {
+    return api.delete<void>(`/resumes/${id}`);
   },
 
   // Set default resume
-  setDefaultResume: async (id: string): Promise<Resume> => {
-    const response = await apiClient.patch(`/resumes/${id}/default`, {});
-    return response.data.data;
+  setDefaultResume: (id: string): Promise<Resume> => {
+    return api.patch<Resume>(`/resumes/${id}/default`, {});
   },
 };

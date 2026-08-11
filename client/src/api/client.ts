@@ -1,6 +1,7 @@
 import axios, { AxiosError, InternalAxiosRequestConfig } from "axios";
 import { toast } from "@/lib/toast";
 import { logError } from "@/lib/error-handler";
+import { ApiResponse } from "@/types/api";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:7000/api";
 
@@ -67,6 +68,36 @@ apiClient.interceptors.response.use(
   },
 );
 
+// Type-safe API helpers
+export const api = {
+  get: <T>(url: string): Promise<T> => {
+    return apiClient.get<ApiResponse<T>>(url).then((res) => res.data.data);
+  },
+
+  post: <T>(url: string, data?: unknown): Promise<T> => {
+    return apiClient
+      .post<ApiResponse<T>>(url, data)
+      .then((res) => res.data.data);
+  },
+
+  patch: <T>(url: string, data?: unknown): Promise<T> => {
+    return apiClient
+      .patch<ApiResponse<T>>(url, data)
+      .then((res) => res.data.data);
+  },
+
+  delete: <T>(url: string): Promise<T> => {
+    return apiClient.delete<ApiResponse<T>>(url).then((res) => res.data.data);
+  },
+
+  put: <T>(url: string, data?: unknown): Promise<T> => {
+    return apiClient
+      .put<ApiResponse<T>>(url, data)
+      .then((res) => res.data.data);
+  },
+};
+
+// Helper to extract error message
 export const getApiErrorMessage = (error: unknown): string => {
   if (axios.isAxiosError(error)) {
     const data = error.response?.data as { message?: string } | undefined;

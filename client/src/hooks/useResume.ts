@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { resumeApi } from "@/api/resume";
 import { Resume, CreateResumeData } from "@/types/models";
+import { toast } from "@/lib/toast";
+import { logError } from "@/lib/error-handler";
 
 export function useResume() {
   const [resumes, setResumes] = useState<Resume[]>([]);
@@ -8,65 +10,55 @@ export function useResume() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Load all resumes
   const loadResumes = async () => {
     setIsLoading(true);
     setError(null);
     try {
       const data = await resumeApi.getResumes();
       setResumes(data);
-    } catch (err: any) {
-      setError(err.response?.data?.message || "Failed to load resumes");
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : "Failed to load resumes";
+      setError(message);
+      logError(err, "Load Resumes");
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Load single resume
-  // Load single resume
   const loadResume = async (id: string) => {
     setIsLoading(true);
     setError(null);
     try {
-      const token = localStorage.getItem("token");
-      console.log("loadResume - Token exists?", !!token);
-      console.log("loadResume - Resume ID:", id);
-
       const data = await resumeApi.getResume(id);
-      console.log("loadResume - Data received:", data);
       setSelectedResume(data);
-    } catch (err: any) {
-      console.error("loadResume - Error:", err);
-      console.error("loadResume - Response:", err.response);
-
+    } catch (err) {
       const message =
-        err.response?.data?.message || err.message || "Failed to load resume";
+        err instanceof Error ? err.message : "Failed to load resume";
       setError(message);
-
-      // If 401, redirect to login (handled by interceptor)
-      // If 404, show not found
-      if (err.response?.status === 404) {
-        setError("Resume not found");
-      }
+      logError(err, "Load Resume");
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Create resume
   const createResume = async (data: CreateResumeData) => {
     setError(null);
     try {
       const newResume = await resumeApi.createResume(data);
       setResumes([...resumes, newResume]);
+      toast.success("Resume created successfully");
       return newResume;
-    } catch (err: any) {
-      setError(err.response?.data?.message || "Failed to create resume");
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : "Failed to create resume";
+      setError(message);
+      toast.error(message);
+      logError(err, "Create Resume");
       throw err;
     }
   };
 
-  // Update resume
   const updateResume = async (id: string, data: Partial<CreateResumeData>) => {
     setError(null);
     try {
@@ -75,14 +67,18 @@ export function useResume() {
       if (selectedResume?.id === id) {
         setSelectedResume(updated);
       }
+      toast.success("Resume updated successfully");
       return updated;
-    } catch (err: any) {
-      setError(err.response?.data?.message || "Failed to update resume");
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : "Failed to update resume";
+      setError(message);
+      toast.error(message);
+      logError(err, "Update Resume");
       throw err;
     }
   };
 
-  // Delete resume
   const deleteResume = async (id: string) => {
     setError(null);
     try {
@@ -91,13 +87,17 @@ export function useResume() {
       if (selectedResume?.id === id) {
         setSelectedResume(null);
       }
-    } catch (err: any) {
-      setError(err.response?.data?.message || "Failed to delete resume");
+      toast.success("Resume deleted successfully");
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : "Failed to delete resume";
+      setError(message);
+      toast.error(message);
+      logError(err, "Delete Resume");
       throw err;
     }
   };
 
-  // Set default resume
   const setDefault = async (id: string) => {
     setError(null);
     try {
@@ -108,13 +108,17 @@ export function useResume() {
           isDefault: r.id === id,
         })),
       );
-    } catch (err: any) {
-      setError(err.response?.data?.message || "Failed to set default resume");
+      toast.success("Default resume updated");
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : "Failed to set default resume";
+      setError(message);
+      toast.error(message);
+      logError(err, "Set Default Resume");
       throw err;
     }
   };
 
-  // Load resumes on mount
   useEffect(() => {
     loadResumes();
   }, []);

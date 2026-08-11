@@ -1,18 +1,20 @@
-import { apiClient } from "./client";
-import { UpdateProfileData, ProfileResponse } from "@/types/models";
+import { api } from "./client";
+import { Profile, UpdateProfileData } from "@/types/models";
 
 export const profileApi = {
-  getProfile: () => {
-    return apiClient.get<ProfileResponse>("/profile");
+  getProfile: (): Promise<Profile> => {
+    return api.get<Profile>("/profile");
   },
 
-  updateProfile: (data: UpdateProfileData) => {
-    return apiClient.patch<ProfileResponse>("/profile", data);
+  updateProfile: (data: UpdateProfileData): Promise<Profile> => {
+    return api.patch<Profile>("/profile", data);
   },
 
-  deleteAccount: (password: string) => {
-    return apiClient.delete<{ success: boolean; message: string }>("/profile", {
-      data: { password },
-    });
+  deleteAccount: (
+    password: string,
+  ): Promise<{ success: boolean; message: string }> => {
+    return api.delete<{ success: boolean; message: string }>(
+      `/profile?password=${encodeURIComponent(password)}`,
+    );
   },
 };
