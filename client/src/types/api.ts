@@ -1,4 +1,7 @@
-// API Response Types
+// ============================================
+// API RESPONSE TYPES
+// ============================================
+
 export interface ApiResponse<T> {
   success: boolean;
   statusCode: number;
@@ -26,7 +29,6 @@ export interface PaginatedResponse<T> {
   totalPages: number;
 }
 
-// API Error Type
 export type ApiError = {
   response?: {
     data?: ApiErrorResponse;
@@ -35,7 +37,10 @@ export type ApiError = {
   message: string;
 };
 
-// Request Types
+// ============================================
+// REQUEST TYPES
+// ============================================
+
 export interface PaginatedRequest {
   page?: number;
   limit?: number;
@@ -43,7 +48,10 @@ export interface PaginatedRequest {
   sortOrder?: "asc" | "desc";
 }
 
-// Auth Types
+// ============================================
+// AUTH TYPES
+// ============================================
+
 export interface LoginRequest {
   email: string;
   password: string;
@@ -64,7 +72,10 @@ export interface AuthResponse {
   token: string;
 }
 
-// Profile Types
+// ============================================
+// PROFILE TYPES
+// ============================================
+
 export interface UpdateProfileRequest {
   headline?: string;
   bio?: string;
@@ -77,7 +88,10 @@ export interface UpdateProfileRequest {
   location?: string;
 }
 
-// Resume Types
+// ============================================
+// RESUME TYPES
+// ============================================
+
 export interface CreateResumeRequest {
   title: string;
   personalDetails: {
@@ -148,7 +162,10 @@ export interface UpdateResumeRequest {
   }>;
 }
 
-// Upload Types
+// ============================================
+// UPLOAD TYPES
+// ============================================
+
 export interface UploadResumeRequest {
   resume: File;
 }
@@ -161,7 +178,10 @@ export interface UploadResumeResponse {
   characterCount: number;
 }
 
-// ATS Types
+// ============================================
+// ATS TYPES - UPDATED
+// ============================================
+
 export interface ATSAnalyzeRequest {
   text: string;
 }
@@ -171,27 +191,51 @@ export interface ATSAnalyzeWithJDRequest {
   jobDescription: string;
 }
 
-export interface ATSSection {
-  name: string;
-  content: string;
-  isPresent: boolean;
+export interface ATSScore {
+  overallScore: number;
+  breakdown: {
+    summary: number;
+    skills: number;
+    experience: number;
+    projects: number;
+    education: number;
+    certifications: number;
+    achievements: number;
+    languages: number;
+    skillCount: number;
+    resumeLength: number;
+  };
+  missingSections: string[];
+  recommendations: string[];
 }
 
 export interface ATSAnalysisResponse {
-  score: number;
-  sections: ATSSection[];
-  missingSections: string[];
-  recommendations: string[];
-  extractedSkills: string[];
+  sections: {
+    summary: string;
+    skills: string;
+    experience: string;
+    projects: string;
+    education: string;
+    certifications: string;
+    achievements: string;
+    languages: string;
+  };
+  skills: string[];
+  score: ATSScore;
 }
 
 export interface ATSAnalysisWithJDResponse extends ATSAnalysisResponse {
-  matchPercentage: number;
-  matchedSkills: string[];
-  missingSkills: string[];
+  skillMatch: {
+    matchedSkills: string[];
+    missingSkills: string[];
+    matchPercentage: number;
+  };
 }
 
-// AI Types
+// ============================================
+// AI TYPES
+// ============================================
+
 export interface AIReviewRequest {
   resumeText: string;
 }

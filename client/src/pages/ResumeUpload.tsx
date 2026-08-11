@@ -1,6 +1,7 @@
 import { useState, useRef } from "react";
-import { useUpload } from "@/hooks/useUpload";
 import { useNavigate } from "react-router-dom";
+import { useUpload } from "@/hooks/useUpload";
+import { toast } from "@/lib/toast";
 
 export default function ResumeUpload() {
   const [file, setFile] = useState<File | null>(null);
@@ -31,26 +32,32 @@ export default function ResumeUpload() {
   };
 
   const handleUpload = async () => {
-    if (!file) return;
+    if (!file) {
+      toast.error("Please select a file first");
+      return;
+    }
     try {
       const result = await uploadResume(file);
       setExtractedText(result.text);
+      toast.success("Resume uploaded successfully");
     } catch (err) {
-      console.error("Upload failed:", err);
+      //error handeled by hook
     }
   };
 
   const handleAnalyze = async () => {
-    if (!extractedText) return;
+    if (!extractedText) {
+      toast.error("No text to analyze. Please upload a resume first.");
+      return;
+    }
+
     try {
       if (showJDInput && jobDescription) {
         await analyzeWithJobDescription(extractedText, jobDescription);
       } else {
         await analyzeResume(extractedText);
       }
-    } catch (err) {
-      console.error("Analysis failed:", err);
-    }
+    } catch (err) {}
   };
 
   const handleReset = () => {
@@ -109,7 +116,6 @@ export default function ResumeUpload() {
             )}
           </div>
 
-          {/* Upload Result */}
           {uploadResult && (
             <div className="bg-green-50 border border-green-200 rounded-lg p-4">
               <p className="text-sm text-green-800">
@@ -152,7 +158,6 @@ export default function ResumeUpload() {
             ATS Analysis
           </h2>
 
-          {/* Job Description Toggle */}
           <div className="mb-4">
             <label className="flex items-center gap-2 text-sm text-gray-700">
               <input
@@ -165,7 +170,6 @@ export default function ResumeUpload() {
             </label>
           </div>
 
-          {/* Job Description Input */}
           {showJDInput && (
             <div className="mb-4">
               <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -189,32 +193,33 @@ export default function ResumeUpload() {
             {isAnalyzing ? "Analyzing..." : "Analyze Resume"}
           </button>
 
-          {/* Analysis Results */}
+          {/* Analysis Results - Updated to match new API response */}
           {analysisResult && (
             <div className="mt-6 space-y-4">
+              {/* Score */}
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                 <div className="flex items-center gap-4">
                   <span className="text-lg font-bold text-blue-700">
-                    ATS Score: {analysisResult.score}%
+                    ATS Score: {analysisResult.score?.overallScore || 0}%
                   </span>
                   <span className="text-sm text-gray-600">
-                    {analysisResult.score >= 80
+                    {(analysisResult.score?.overallScore || 0) >= 80
                       ? "✅ Good"
-                      : analysisResult.score >= 60
+                      : (analysisResult.score?.overallScore || 0) >= 60
                         ? "⚠️ Needs Improvement"
                         : "❌ Needs Work"}
                   </span>
                 </div>
               </div>
 
-              {/* Extracted Skills */}
-              {analysisResult.extractedSkills.length > 0 && (
+              {/* Skills */}
+              {analysisResult.skills && analysisResult.skills.length > 0 && (
                 <div>
                   <h3 className="text-sm font-medium text-gray-700 mb-2">
                     Detected Skills
                   </h3>
                   <div className="flex flex-wrap gap-2">
-                    {analysisResult.extractedSkills.map((skill, i) => (
+                    {analysisResult.skills.map((skill: string, i: number) => (
                       <span
                         key={i}
                         className="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-sm"
@@ -227,39 +232,45 @@ export default function ResumeUpload() {
               )}
 
               {/* Missing Sections */}
-              {analysisResult.missingSections.length > 0 && (
-                <div>
-                  <h3 className="text-sm font-medium text-gray-700 mb-2">
-                    Missing Sections
-                  </h3>
-                  <div className="flex flex-wrap gap-2">
-                    {analysisResult.missingSections.map((section, i) => (
-                      <span
-                        key={i}
-                        className="px-3 py-1 bg-yellow-50 text-yellow-700 rounded-full text-sm"
-                      >
-                        {section}
-                      </span>
-                    ))}
+              {analysisResult.score?.missingSections &&
+                analysisResult.score.missingSections.length > 0 && (
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-700 mb-2">
+                      Missing Sections
+                    </h3>
+                    <div className="flex flex-wrap gap-2">
+                      {analysisResult.score.missingSections.map(
+                        (section: string, i: number) => (
+                          <span
+                            key={i}
+                            className="px-3 py-1 bg-yellow-50 text-yellow-700 rounded-full text-sm"
+                          >
+                            {section}
+                          </span>
+                        ),
+                      )}
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
 
               {/* Recommendations */}
-              {analysisResult.recommendations.length > 0 && (
-                <div>
-                  <h3 className="text-sm font-medium text-gray-700 mb-2">
-                    Recommendations
-                  </h3>
-                  <ul className="list-disc list-inside space-y-1">
-                    {analysisResult.recommendations.map((rec, i) => (
-                      <li key={i} className="text-sm text-gray-600">
-                        {rec}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
+              {analysisResult.score?.recommendations &&
+                analysisResult.score.recommendations.length > 0 && (
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-700 mb-2">
+                      Recommendations
+                    </h3>
+                    <ul className="list-disc list-inside space-y-1">
+                      {analysisResult.score.recommendations.map(
+                        (rec: string, i: number) => (
+                          <li key={i} className="text-sm text-gray-600">
+                            {rec}
+                          </li>
+                        ),
+                      )}
+                    </ul>
+                  </div>
+                )}
             </div>
           )}
 
@@ -269,48 +280,68 @@ export default function ResumeUpload() {
               <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
                 <div className="flex items-center gap-4">
                   <span className="text-lg font-bold text-purple-700">
-                    Match: {analysisWithJDResult.matchPercentage}%
+                    Match:{" "}
+                    {analysisWithJDResult.skillMatch?.matchPercentage || 0}%
+                  </span>
+                  <span className="text-sm text-gray-600">
+                    {analysisWithJDResult.skillMatch?.matchPercentage >= 70
+                      ? "✅ Strong Match"
+                      : analysisWithJDResult.skillMatch?.matchPercentage >= 50
+                        ? "⚠️ Partial Match"
+                        : "❌ Weak Match"}
                   </span>
                 </div>
               </div>
 
-              {/* Matched vs Missing Skills */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                {analysisWithJDResult.matchedSkills.length > 0 && (
-                  <div>
-                    <h3 className="text-sm font-medium text-green-700 mb-2">
-                      ✅ Matched Skills
-                    </h3>
-                    <div className="flex flex-wrap gap-2">
-                      {analysisWithJDResult.matchedSkills.map((skill, i) => (
-                        <span
-                          key={i}
-                          className="px-3 py-1 bg-green-50 text-green-700 rounded-full text-sm"
-                        >
-                          {skill}
-                        </span>
-                      ))}
+                {analysisWithJDResult.skillMatch?.matchedSkills &&
+                  analysisWithJDResult.skillMatch.matchedSkills.length > 0 && (
+                    <div>
+                      <h3 className="text-sm font-medium text-green-700 mb-2">
+                        ✅ Matched Skills
+                      </h3>
+                      <div className="flex flex-wrap gap-2">
+                        {analysisWithJDResult.skillMatch.matchedSkills.map(
+                          (skill: string, i: number) => (
+                            <span
+                              key={i}
+                              className="px-3 py-1 bg-green-50 text-green-700 rounded-full text-sm"
+                            >
+                              {skill}
+                            </span>
+                          ),
+                        )}
+                      </div>
                     </div>
-                  </div>
-                )}
-                {analysisWithJDResult.missingSkills.length > 0 && (
-                  <div>
-                    <h3 className="text-sm font-medium text-red-700 mb-2">
-                      ❌ Missing Skills
-                    </h3>
-                    <div className="flex flex-wrap gap-2">
-                      {analysisWithJDResult.missingSkills.map((skill, i) => (
-                        <span
-                          key={i}
-                          className="px-3 py-1 bg-red-50 text-red-700 rounded-full text-sm"
-                        >
-                          {skill}
-                        </span>
-                      ))}
+                  )}
+                {analysisWithJDResult.skillMatch?.missingSkills &&
+                  analysisWithJDResult.skillMatch.missingSkills.length > 0 && (
+                    <div>
+                      <h3 className="text-sm font-medium text-red-700 mb-2">
+                        ❌ Missing Skills
+                      </h3>
+                      <div className="flex flex-wrap gap-2">
+                        {analysisWithJDResult.skillMatch.missingSkills.map(
+                          (skill: string, i: number) => (
+                            <span
+                              key={i}
+                              className="px-3 py-1 bg-red-50 text-red-700 rounded-full text-sm"
+                            >
+                              {skill}
+                            </span>
+                          ),
+                        )}
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )}
               </div>
+
+              {/* Also show ATS score breakdown for context */}
+              {analysisWithJDResult.score && (
+                <div className="mt-4 text-sm text-gray-500">
+                  ATS Score: {analysisWithJDResult.score.overallScore}%
+                </div>
+              )}
             </div>
           )}
         </div>

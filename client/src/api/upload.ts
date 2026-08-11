@@ -6,7 +6,6 @@ import {
 } from "@/types/api";
 
 export const uploadApi = {
-  // Upload resume file (PDF/DOCX)
   uploadResume: async (file: File): Promise<UploadResumeResponse> => {
     const formData = new FormData();
     formData.append("resume", file);
@@ -23,23 +22,21 @@ export const uploadApi = {
     return response.data.data;
   },
 
-  // ATS Analysis
   analyzeResume: async (text: string): Promise<ATSAnalysisResponse> => {
     const response = await apiClient.post<{ data: ATSAnalysisResponse }>(
       "/ats/analyze",
-      { text },
+      { resumeText: text },
     );
     return response.data.data;
   },
 
-  // ATS Analysis with Job Description
   analyzeWithJobDescription: async (
     text: string,
     jobDescription: string,
   ): Promise<ATSAnalysisWithJDResponse> => {
     const response = await apiClient.post<{ data: ATSAnalysisWithJDResponse }>(
       "/ats/analyze-with-job-description",
-      { text, jobDescription },
+      { resumeText: text, jobDescription },
     );
     return response.data.data;
   },
