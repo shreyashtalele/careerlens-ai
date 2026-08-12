@@ -5,6 +5,7 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { Layout } from "@/components/Layout";
 import { PageLoading } from "@/components/comman/LoadingSpinner";
+import { PageTransition } from "@/components/PageTransition";
 
 // Lazy load pages
 const Login = lazy(() => import("@/pages/Login"));
@@ -42,13 +43,62 @@ function App() {
 
             <Route element={<ProtectedRoute />}>
               <Route element={<Layout />}>
-                <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="/resumes" element={<Resumes />} />
-                <Route path="/resumes/:id" element={<ResumeDetail />} />
-                <Route path="/upload" element={<ResumeUpload />} />
-                <Route path="/profile" element={<Profile />} />
-                <Route path="/ai-review" element={<AIReview />} />
-                <Route path="/interview" element={<Interview />} />
+                <Route
+                  path="/dashboard"
+                  element={
+                    <PageTransition>
+                      <Dashboard />
+                    </PageTransition>
+                  }
+                />
+                <Route
+                  path="/resumes"
+                  element={
+                    <PageTransition>
+                      <Resumes />
+                    </PageTransition>
+                  }
+                />
+                <Route
+                  path="/resumes/:id"
+                  element={
+                    <PageTransition>
+                      <ResumeDetail />
+                    </PageTransition>
+                  }
+                />
+                <Route
+                  path="/upload"
+                  element={
+                    <PageTransition>
+                      <ResumeUpload />
+                    </PageTransition>
+                  }
+                />
+                <Route
+                  path="/profile"
+                  element={
+                    <PageTransition>
+                      <Profile />
+                    </PageTransition>
+                  }
+                />
+                <Route
+                  path="/ai-review"
+                  element={
+                    <PageTransition>
+                      <AIReview />
+                    </PageTransition>
+                  }
+                />
+                <Route
+                  path="/interview"
+                  element={
+                    <PageTransition>
+                      <Interview />
+                    </PageTransition>
+                  }
+                />
               </Route>
             </Route>
 
