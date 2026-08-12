@@ -5,6 +5,8 @@ import { ResumeView } from "@/components/resume/ResumeView";
 import { ResumeForm } from "@/components/resume/ResumeForm";
 import { Resume } from "@/types/models";
 import { ResumeDetailSkeleton } from "@/components/resume/ResumeSkeleton";
+import { Button, Badge } from "@/components/ui";
+import { ArrowLeft, Edit, X } from "lucide-react";
 
 export default function ResumeDetail() {
   const { id } = useParams<{ id: string }>();
@@ -15,21 +17,13 @@ export default function ResumeDetail() {
   const [resumeData, setResumeData] = useState<Resume | null>(null);
 
   useEffect(() => {
-    console.log("ResumeDetail: id =", id);
-    console.log("Token exists?", !!localStorage.getItem("token"));
-
     if (id) {
-      console.log("Loading resume with id:", id);
       loadResume(id);
     }
   }, [id]);
 
   useEffect(() => {
-    console.log("selectedResume changed:", selectedResume);
-    console.log("Error:", error);
-
     if (selectedResume) {
-      console.log("Formatting resume data...");
       const formattedResume: Resume = {
         ...selectedResume,
         personalDetails: selectedResume.personalDetails || {
@@ -48,7 +42,7 @@ export default function ResumeDetail() {
       };
       setResumeData(formattedResume);
     }
-  }, [selectedResume, error]);
+  }, [selectedResume]);
 
   const handleSave = async (data: Resume) => {
     if (!id) return;
@@ -69,12 +63,14 @@ export default function ResumeDetail() {
     return (
       <div className="text-center py-12">
         <p className="text-red-600">Error: {error}</p>
-        <button
+        <Button
+          variant="outline"
           onClick={() => navigate("/resumes")}
-          className="mt-4 text-blue-600 hover:text-blue-700"
+          className="mt-4"
         >
-          ← Back to Resumes
-        </button>
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          Back to Resumes
+        </Button>
       </div>
     );
   }
@@ -83,57 +79,58 @@ export default function ResumeDetail() {
     return (
       <div className="text-center py-12">
         <p className="text-gray-500">Resume not found</p>
-        <button
+        <Button
+          variant="outline"
           onClick={() => navigate("/resumes")}
-          className="mt-4 text-blue-600 hover:text-blue-700"
+          className="mt-4"
         >
-          ← Back to Resumes
-        </button>
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          Back to Resumes
+        </Button>
       </div>
     );
   }
 
   return (
-    <div className="max-w-4xl mx-auto">
-      <div className="flex justify-between items-center mb-6">
+    <div className="max-w-4xl mx-auto space-y-6">
+      {/* Page Header */}
+      <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">
             {resumeData.title}
           </h1>
           {resumeData.isDefault && (
-            <span className="inline-block mt-1 px-2 py-0.5 text-xs font-medium text-blue-700 bg-blue-50 rounded-full">
+            <Badge variant="success" className="mt-2">
               Default
-            </span>
+            </Badge>
           )}
         </div>
         <div className="flex gap-3">
-          <button
-            onClick={() => navigate("/resumes")}
-            className="px-4 py-2 text-sm font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200"
-          >
-            ← Back
-          </button>
+          <Button variant="outline" onClick={() => navigate("/resumes")}>
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back
+          </Button>
           {!isEditing ? (
-            <button
-              onClick={() => setIsEditing(true)}
-              className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700"
-            >
+            <Button variant="primary" onClick={() => setIsEditing(true)}>
+              <Edit className="w-4 h-4 mr-2" />
               Edit Resume
-            </button>
+            </Button>
           ) : (
-            <button
+            <Button
+              variant="outline"
               onClick={() => {
                 setIsEditing(false);
                 if (id) loadResume(id);
               }}
-              className="px-4 py-2 text-sm font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200"
             >
+              <X className="w-4 h-4 mr-2" />
               Cancel
-            </button>
+            </Button>
           )}
         </div>
       </div>
 
+      {/* Content */}
       {isEditing ? (
         <ResumeForm
           resume={resumeData}

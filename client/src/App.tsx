@@ -4,7 +4,7 @@ import { Toaster } from "sonner";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { Layout } from "@/components/Layout";
-import { PageLoading } from "@/components/comman";
+import { PageLoading } from "@/components/comman/LoadingSpinner";
 
 // Lazy load pages
 const Login = lazy(() => import("@/pages/Login"));

@@ -3,8 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { useAI } from "@/hooks/useAI";
 import { useResume } from "@/hooks/useResume";
 import { useUpload } from "@/hooks/useUpload";
-import { LoadingSpinner } from "@/components/comman";
-import { toast } from "@/lib/toast";
+import { Button, Card, CardContent, Badge } from "@/components/ui";
+import { Brain, TrendingUp, CheckCircle2, Clock } from "lucide-react";
 
 export default function Interview() {
   const navigate = useNavigate();
@@ -30,14 +30,12 @@ export default function Interview() {
   const [questionCount, setQuestionCount] = useState<number>(5);
   const [isProcessing, setIsProcessing] = useState(false);
 
-  // Load resume content when selected
   useEffect(() => {
     if (selectedResumeId) {
       loadResume(selectedResumeId);
     }
   }, [selectedResumeId]);
 
-  // Update text when resume is loaded
   useEffect(() => {
     if (selectedResume) {
       const resumeText = [
@@ -76,33 +74,23 @@ export default function Interview() {
 
   const handleGenerate = async () => {
     if (!selectedResumeId) {
-      toast.error("Please select a resume first");
       return;
     }
 
     if (!selectedResumeText || selectedResumeText.length < 100) {
-      toast.error(
-        "Resume text is too short or empty. Please make sure your resume has content.",
-      );
       return;
     }
 
     setIsProcessing(true);
 
     try {
-      toast.loading("Running ATS analysis...");
       const atsResult = await analyzeResume(selectedResumeText);
-      toast.dismiss();
 
       if (!atsResult) {
-        toast.error("ATS analysis failed. Please try again.");
         setIsProcessing(false);
         return;
       }
 
-      toast.success(
-        "ATS analysis completed! Now generating interview questions...",
-      );
       await generateInterviewQuestions(
         selectedResumeText,
         difficulty,
@@ -111,7 +99,6 @@ export default function Interview() {
       );
     } catch (err) {
       console.error("Generation failed:", err);
-      toast.error("Failed to generate questions. Please try again.");
     } finally {
       setIsProcessing(false);
     }
@@ -120,14 +107,14 @@ export default function Interview() {
   if (resumesLoading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <LoadingSpinner size="lg" message="Loading resumes..." />
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600" />
       </div>
     );
   }
 
   const isLoading = isInterviewLoading || isAnalyzing || isProcessing;
 
-  // Helper function to extract question text from different formats
+  // Helper function to extract question text
   const getQuestionText = (q: any): string => {
     if (typeof q === "string") return q;
     if (q.question) return q.question;
@@ -136,121 +123,118 @@ export default function Interview() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-gray-900">
-          Interview Questions
-        </h1>
-        <button
-          onClick={() => navigate("/resumes")}
-          className="text-sm text-blue-600 hover:text-blue-700"
-        >
+    <div className="max-w-4xl mx-auto space-y-6">
+      {/* Page Header */}
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">
+            Interview Questions
+          </h1>
+          <p className="text-gray-500 mt-1">
+            Generate personalized interview questions
+          </p>
+        </div>
+        <Button variant="outline" onClick={() => navigate("/resumes")}>
           ← Back to Resumes
-        </button>
+        </Button>
       </div>
 
-      {/* Select Resume */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">
-          Generate Interview Questions
-        </h2>
-        <div className="flex flex-col gap-4">
-          <select
-            value={selectedResumeId}
-            onChange={(e) => handleResumeSelect(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="">Select a resume...</option>
-            {resumes.map((resume) => (
-              <option key={resume.id} value={resume.id}>
-                {resume.title} {resume.isDefault ? "(Default)" : ""}
-              </option>
-            ))}
-          </select>
+      {/* Select Resume Card */}
+      <Card>
+        <CardContent className="p-6">
+          <div className="flex flex-col gap-4">
+            <select
+              value={selectedResumeId}
+              onChange={(e) => handleResumeSelect(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            >
+              <option value="">Select a resume...</option>
+              {resumes.map((resume) => (
+                <option key={resume.id} value={resume.id}>
+                  {resume.title} {resume.isDefault ? "(Default)" : ""}
+                </option>
+              ))}
+            </select>
 
-          {selectedResumeText && (
-            <div className="text-sm text-gray-500">
-              Resume text loaded: {selectedResumeText.length} characters
-              {selectedResumeText.length < 100 && (
-                <span className="ml-2 text-red-500">
-                  (Too short - please add more content to your resume)
-                </span>
+            {selectedResumeText && (
+              <div className="text-sm text-gray-500">
+                Resume text loaded: {selectedResumeText.length} characters
+                {selectedResumeText.length < 100 && (
+                  <span className="ml-2 text-red-500">(Too short)</span>
+                )}
+              </div>
+            )}
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Difficulty
+                </label>
+                <select
+                  value={difficulty}
+                  onChange={(e) =>
+                    setDifficulty(e.target.value as "easy" | "medium" | "hard")
+                  }
+                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="easy">Easy</option>
+                  <option value="medium">Medium</option>
+                  <option value="hard">Hard</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Number of Questions
+                </label>
+                <input
+                  type="number"
+                  min={3}
+                  max={10}
+                  value={questionCount}
+                  onChange={(e) => setQuestionCount(Number(e.target.value))}
+                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+            </div>
+
+            <div className="flex gap-3">
+              <Button
+                onClick={handleGenerate}
+                disabled={!selectedResumeId || isLoading}
+              >
+                {isLoading ? "Processing..." : "Generate Questions"}
+                {!isLoading && <Brain className="w-4 h-4 ml-2" />}
+              </Button>
+              {interviewQuestions && (
+                <Button variant="outline" onClick={resetInterview}>
+                  Clear Results
+                </Button>
               )}
             </div>
-          )}
 
-          <div className="flex flex-col md:flex-row gap-4">
-            <div className="flex-1">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Difficulty
-              </label>
-              <select
-                value={difficulty}
-                onChange={(e) =>
-                  setDifficulty(e.target.value as "easy" | "medium" | "hard")
-                }
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="easy">Easy</option>
-                <option value="medium">Medium</option>
-                <option value="hard">Hard</option>
-              </select>
-            </div>
-            <div className="flex-1">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Number of Questions
-              </label>
-              <input
-                type="number"
-                min={3}
-                max={10}
-                value={questionCount}
-                onChange={(e) => setQuestionCount(Number(e.target.value))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-          </div>
+            {isLoading && (
+              <div className="text-sm text-purple-600">
+                {isAnalyzing
+                  ? "Running ATS analysis..."
+                  : isInterviewLoading
+                    ? "Generating questions..."
+                    : "Processing..."}
+              </div>
+            )}
 
-          <div className="flex gap-3">
-            <button
-              onClick={handleGenerate}
-              disabled={!selectedResumeId || isLoading}
-              className="px-6 py-2 text-sm font-medium text-white bg-purple-600 rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isLoading ? "Processing..." : "Generate Questions"}
-            </button>
+            {error && (
+              <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-sm text-red-700">
+                {error}
+              </div>
+            )}
             {interviewQuestions && (
-              <button
-                onClick={resetInterview}
-                className="px-4 py-2 text-sm font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
-              >
-                Clear Results
-              </button>
+              <div className="text-sm text-green-600">
+                ✅ Questions generated successfully!
+              </div>
             )}
           </div>
-
-          {isLoading && (
-            <div className="text-sm text-purple-600">
-              {isAnalyzing
-                ? "Running ATS analysis..."
-                : isInterviewLoading
-                  ? "Generating interview questions..."
-                  : "Processing..."}
-            </div>
-          )}
-
-          {error && (
-            <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-sm text-red-700">
-              {error}
-            </div>
-          )}
-          {interviewQuestions && (
-            <div className="text-sm text-green-600">
-              ✅ Questions generated successfully!
-            </div>
-          )}
-        </div>
-      </div>
+        </CardContent>
+      </Card>
 
       {/* Results */}
       {interviewQuestions && (
@@ -258,13 +242,14 @@ export default function Interview() {
           {/* Technical Questions */}
           {interviewQuestions.technicalQuestions &&
             interviewQuestions.technicalQuestions.length > 0 && (
-              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-                <h2 className="text-lg font-semibold text-blue-700 mb-3">
-                  💻 Technical Questions
-                </h2>
-                <ul className="list-decimal list-inside space-y-3">
-                  {interviewQuestions.technicalQuestions.map(
-                    (q: any, i: number) => (
+              <Card>
+                <CardContent className="p-6">
+                  <h2 className="text-lg font-semibold text-blue-700 mb-3 flex items-center gap-2">
+                    <TrendingUp className="w-5 h-5" />
+                    Technical Questions
+                  </h2>
+                  <ul className="list-decimal list-inside space-y-3">
+                    {interviewQuestions.technicalQuestions.map((q, i) => (
                       <li key={i} className="text-gray-700 text-sm">
                         {getQuestionText(q)}
                         {q.topic && (
@@ -273,35 +258,37 @@ export default function Interview() {
                           </span>
                         )}
                         {q.difficulty && (
-                          <span
-                            className={`block text-xs mt-1 ${
+                          <Badge
+                            variant={
                               q.difficulty === "easy"
-                                ? "text-green-600"
+                                ? "success"
                                 : q.difficulty === "medium"
-                                  ? "text-yellow-600"
-                                  : "text-red-600"
-                            }`}
+                                  ? "warning"
+                                  : "danger"
+                            }
+                            className="mt-1"
                           >
-                            Difficulty: {q.difficulty}
-                          </span>
+                            {q.difficulty}
+                          </Badge>
                         )}
                       </li>
-                    ),
-                  )}
-                </ul>
-              </div>
+                    ))}
+                  </ul>
+                </CardContent>
+              </Card>
             )}
 
           {/* Project Questions */}
           {interviewQuestions.projectQuestions &&
             interviewQuestions.projectQuestions.length > 0 && (
-              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-                <h2 className="text-lg font-semibold text-green-700 mb-3">
-                  📁 Project Questions
-                </h2>
-                <ul className="list-decimal list-inside space-y-3">
-                  {interviewQuestions.projectQuestions.map(
-                    (q: any, i: number) => (
+              <Card>
+                <CardContent className="p-6">
+                  <h2 className="text-lg font-semibold text-green-700 mb-3 flex items-center gap-2">
+                    <CheckCircle2 className="w-5 h-5" />
+                    Project Questions
+                  </h2>
+                  <ul className="list-decimal list-inside space-y-3">
+                    {interviewQuestions.projectQuestions.map((q, i) => (
                       <li key={i} className="text-gray-700 text-sm">
                         {getQuestionText(q)}
                         {q.topic && (
@@ -310,22 +297,22 @@ export default function Interview() {
                           </span>
                         )}
                       </li>
-                    ),
-                  )}
-                </ul>
-              </div>
+                    ))}
+                  </ul>
+                </CardContent>
+              </Card>
             )}
 
           {/* Behavioral Questions */}
           {interviewQuestions.behavioralQuestions &&
             interviewQuestions.behavioralQuestions.length > 0 && (
-              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-                <h2 className="text-lg font-semibold text-orange-700 mb-3">
-                  🧠 Behavioral Questions
-                </h2>
-                <ul className="list-decimal list-inside space-y-3">
-                  {interviewQuestions.behavioralQuestions.map(
-                    (q: any, i: number) => (
+              <Card>
+                <CardContent className="p-6">
+                  <h2 className="text-lg font-semibold text-orange-700 mb-3 flex items-center gap-2">
+                    🧠 Behavioral Questions
+                  </h2>
+                  <ul className="list-decimal list-inside space-y-3">
+                    {interviewQuestions.behavioralQuestions.map((q, i) => (
                       <li key={i} className="text-gray-700 text-sm">
                         {getQuestionText(q)}
                         {q.topic && (
@@ -334,44 +321,22 @@ export default function Interview() {
                           </span>
                         )}
                       </li>
-                    ),
-                  )}
-                </ul>
-              </div>
+                    ))}
+                  </ul>
+                </CardContent>
+              </Card>
             )}
 
           {/* HR Questions */}
           {interviewQuestions.hrQuestions &&
             interviewQuestions.hrQuestions.length > 0 && (
-              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-                <h2 className="text-lg font-semibold text-purple-700 mb-3">
-                  👤 HR Questions
-                </h2>
-                <ul className="list-decimal list-inside space-y-3">
-                  {interviewQuestions.hrQuestions.map((q: any, i: number) => (
-                    <li key={i} className="text-gray-700 text-sm">
-                      {getQuestionText(q)}
-                      {q.topic && (
-                        <span className="block text-xs text-gray-400 mt-1">
-                          Topic: {q.topic}
-                        </span>
-                      )}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
-          {/* Follow-up Questions */}
-          {interviewQuestions.followUpQuestions &&
-            interviewQuestions.followUpQuestions.length > 0 && (
-              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-                <h2 className="text-lg font-semibold text-pink-700 mb-3">
-                  🔄 Follow-up Questions
-                </h2>
-                <ul className="list-decimal list-inside space-y-3">
-                  {interviewQuestions.followUpQuestions.map(
-                    (q: any, i: number) => (
+              <Card>
+                <CardContent className="p-6">
+                  <h2 className="text-lg font-semibold text-purple-700 mb-3 flex items-center gap-2">
+                    👤 HR Questions
+                  </h2>
+                  <ul className="list-decimal list-inside space-y-3">
+                    {interviewQuestions.hrQuestions.map((q, i) => (
                       <li key={i} className="text-gray-700 text-sm">
                         {getQuestionText(q)}
                         {q.topic && (
@@ -380,43 +345,70 @@ export default function Interview() {
                           </span>
                         )}
                       </li>
-                    ),
-                  )}
-                </ul>
-              </div>
+                    ))}
+                  </ul>
+                </CardContent>
+              </Card>
+            )}
+
+          {/* Follow-up Questions */}
+          {interviewQuestions.followUpQuestions &&
+            interviewQuestions.followUpQuestions.length > 0 && (
+              <Card>
+                <CardContent className="p-6">
+                  <h2 className="text-lg font-semibold text-pink-700 mb-3 flex items-center gap-2">
+                    <Clock className="w-5 h-5" />
+                    Follow-up Questions
+                  </h2>
+                  <ul className="list-decimal list-inside space-y-3">
+                    {interviewQuestions.followUpQuestions.map((q, i) => (
+                      <li key={i} className="text-gray-700 text-sm">
+                        {getQuestionText(q)}
+                        {q.topic && (
+                          <span className="block text-xs text-gray-400 mt-1">
+                            Topic: {q.topic}
+                          </span>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                </CardContent>
+              </Card>
             )}
 
           {/* Preparation Tips */}
           {interviewQuestions.preparationTips &&
             interviewQuestions.preparationTips.length > 0 && (
-              <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl border border-blue-100 p-6">
-                <h2 className="text-lg font-semibold text-gray-900 mb-3">
-                  📝 Preparation Tips
-                </h2>
-                <ul className="list-disc list-inside space-y-2">
-                  {interviewQuestions.preparationTips.map(
-                    (tip: string, i: number) => (
+              <Card className="border-blue-200 bg-gradient-to-r from-blue-50 to-purple-50">
+                <CardContent className="p-6">
+                  <h2 className="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                    📝 Preparation Tips
+                  </h2>
+                  <ul className="list-disc list-inside space-y-2">
+                    {interviewQuestions.preparationTips.map((tip, i) => (
                       <li key={i} className="text-gray-700 text-sm">
                         {tip}
                       </li>
-                    ),
-                  )}
-                </ul>
-              </div>
+                    ))}
+                  </ul>
+                </CardContent>
+              </Card>
             )}
         </div>
       )}
 
       {!interviewQuestions && !isLoading && (
-        <div className="text-center py-12 bg-white rounded-2xl shadow-sm border border-gray-100">
-          <p className="text-gray-500">
-            Select a resume and click "Generate Questions" to get interview
-            questions
-          </p>
-          <p className="text-sm text-gray-400 mt-2">
-            AI will generate questions based on your resume content
-          </p>
-        </div>
+        <Card>
+          <CardContent className="p-12 text-center">
+            <Brain className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+            <p className="text-gray-500">
+              Select a resume and click "Generate Questions"
+            </p>
+            <p className="text-sm text-gray-400 mt-2">
+              AI will generate questions based on your resume content
+            </p>
+          </CardContent>
+        </Card>
       )}
     </div>
   );
