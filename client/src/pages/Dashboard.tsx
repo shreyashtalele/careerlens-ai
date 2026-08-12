@@ -52,11 +52,12 @@ export default function Dashboard() {
       </FadeIn>
 
       {/* Stats Grid with Stagger */}
+      {/* Stats Grid - Responsive */}
       <StaggerChildren>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {/* Total Resumes */}
           <motion.div variants={StaggerItem}>
-            <Card className="hover:shadow-lg transition-all duration-200 hover:-translate-y-1">
+            <Card className="hover:shadow-lg transition-all duration-200 hover:-translate-y-1 h-full">
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-sm font-medium text-gray-500">
@@ -66,7 +67,7 @@ export default function Dashboard() {
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="text-3xl font-bold text-gray-900">
+                <div className="text-2xl sm:text-3xl font-bold text-gray-900">
                   {totalResumes}
                 </div>
                 <p className="text-sm text-gray-500 mt-1">
@@ -80,7 +81,7 @@ export default function Dashboard() {
 
           {/* Default Resume */}
           <motion.div variants={StaggerItem}>
-            <Card className="hover:shadow-lg transition-all duration-200 hover:-translate-y-1">
+            <Card className="hover:shadow-lg transition-all duration-200 hover:-translate-y-1 h-full">
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-sm font-medium text-gray-500">
@@ -104,7 +105,7 @@ export default function Dashboard() {
 
           {/* AI Features */}
           <motion.div variants={StaggerItem}>
-            <Card className="hover:shadow-lg transition-all duration-200 hover:-translate-y-1">
+            <Card className="hover:shadow-lg transition-all duration-200 hover:-translate-y-1 h-full">
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-sm font-medium text-gray-500">
@@ -123,7 +124,6 @@ export default function Dashboard() {
           </motion.div>
         </div>
       </StaggerChildren>
-
       {/* Quick Actions */}
       <FadeIn delay={0.2}>
         <Card>

@@ -69,12 +69,20 @@ export default function Resumes() {
     <div className="max-w-6xl mx-auto space-y-6">
       {/* Page Header */}
       <FadeIn>
-        <div className="flex justify-between items-center">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Resumes</h1>
-            <p className="text-gray-500 mt-1">Manage your resumes</p>
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
+              Resumes
+            </h1>
+            <p className="text-sm sm:text-base text-gray-500 mt-1">
+              Manage your resumes
+            </p>
           </div>
-          <Button variant="primary" onClick={() => setShowCreateForm(true)}>
+          <Button
+            variant="primary"
+            onClick={() => setShowCreateForm(true)}
+            className="w-full sm:w-auto"
+          >
             <Plus className="w-4 h-4 mr-2" />
             New Resume
           </Button>
@@ -85,24 +93,32 @@ export default function Resumes() {
       {showCreateForm && (
         <FadeIn>
           <Card>
-            <CardContent className="p-6">
-              <form onSubmit={handleCreate} className="flex gap-4">
+            <CardContent className="p-4 sm:p-6">
+              <form
+                onSubmit={handleCreate}
+                className="flex flex-col sm:flex-row gap-3 sm:gap-4"
+              >
                 <input
                   type="text"
                   value={newTitle}
                   onChange={(e) => setNewTitle(e.target.value)}
                   placeholder="Enter resume title..."
-                  className="flex-1 px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="flex-1 px-4 py-3 sm:py-2 text-base sm:text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   autoFocus
                 />
-                <Button type="submit">Create</Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setShowCreateForm(false)}
-                >
-                  Cancel
-                </Button>
+                <div className="flex gap-2">
+                  <Button type="submit" className="flex-1 sm:flex-none">
+                    Create
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setShowCreateForm(false)}
+                    className="flex-1 sm:flex-none"
+                  >
+                    Cancel
+                  </Button>
+                </div>
               </form>
             </CardContent>
           </Card>
@@ -113,9 +129,9 @@ export default function Resumes() {
       {resumes.length === 0 ? (
         <FadeIn>
           <Card>
-            <CardContent className="p-12 text-center">
-              <FileText className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-              <p className="text-gray-500 text-lg">No resumes yet</p>
+            <CardContent className="p-8 sm:p-12 text-center">
+              <FileText className="w-12 h-12 sm:w-16 sm:h-16 text-gray-300 mx-auto mb-4" />
+              <p className="text-lg sm:text-xl text-gray-500">No resumes yet</p>
               <p className="text-sm text-gray-400 mt-1">
                 Create your first resume to get started
               </p>
@@ -140,33 +156,36 @@ export default function Resumes() {
                 className="h-full"
               >
                 <Card className="hover:shadow-lg transition-all duration-200 hover:-translate-y-1 h-full flex flex-col">
-                  <CardContent className="p-6 flex flex-col flex-1">
-                    <div className="flex justify-between items-start flex-1">
-                      <div className="flex-1">
+                  <CardContent className="p-4 sm:p-6 flex flex-col flex-1">
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-start gap-3 sm:gap-0">
+                      <div className="flex-1 w-full sm:w-auto">
                         <div className="flex items-center gap-2 flex-wrap">
-                          <h3 className="text-lg font-semibold text-gray-900">
+                          <h3 className="text-base sm:text-lg font-semibold text-gray-900 break-words">
                             {resume.title}
                           </h3>
                           {resume.isDefault && (
-                            <Badge variant="success">Default</Badge>
+                            <Badge variant="success" className="text-xs">
+                              Default
+                            </Badge>
                           )}
                         </div>
-                        <p className="text-sm text-gray-400 mt-2">
+                        <p className="text-xs sm:text-sm text-gray-400 mt-1 sm:mt-2">
                           Updated:{" "}
                           {new Date(resume.updatedAt).toLocaleDateString()}
                         </p>
                       </div>
-                      <div className="flex flex-col gap-1 ml-4 flex-shrink-0">
+                      <div className="flex flex-row sm:flex-col gap-1 sm:gap-1 w-full sm:w-auto justify-start sm:justify-start flex-wrap sm:flex-nowrap">
                         {!resume.isDefault && (
                           <motion.div
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
+                            className="flex-1 sm:flex-none"
                           >
                             <Button
                               variant="ghost"
                               size="sm"
                               onClick={() => setDefault(resume.id)}
-                              className="text-xs text-blue-600 hover:text-blue-700"
+                              className="text-xs text-blue-600 hover:text-blue-700 w-full sm:w-auto"
                             >
                               <Star className="w-3 h-3 mr-1" />
                               Set Default
@@ -176,12 +195,13 @@ export default function Resumes() {
                         <motion.div
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}
+                          className="flex-1 sm:flex-none"
                         >
                           <Button
                             variant="ghost"
                             size="sm"
                             onClick={() => navigate(`/resumes/${resume.id}`)}
-                            className="text-xs text-gray-600 hover:text-gray-800"
+                            className="text-xs text-gray-600 hover:text-gray-800 w-full sm:w-auto"
                           >
                             <Eye className="w-3 h-3 mr-1" />
                             View
@@ -190,12 +210,13 @@ export default function Resumes() {
                         <motion.div
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}
+                          className="flex-1 sm:flex-none"
                         >
                           <Button
                             variant="ghost"
                             size="sm"
                             onClick={() => setShowDeleteConfirm(resume.id)}
-                            className="text-xs text-red-600 hover:text-red-700"
+                            className="text-xs text-red-600 hover:text-red-700 w-full sm:w-auto"
                           >
                             <Trash2 className="w-3 h-3 mr-1" />
                             Delete

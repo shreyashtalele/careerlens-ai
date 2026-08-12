@@ -21,16 +21,23 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-purple-50 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-purple-50 px-4 py-8">
       <Card className="w-full max-w-md shadow-xl">
-        <CardContent className="p-8">
+        <CardContent className="p-6 sm:p-8">
           {/* Logo / Header */}
-          <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-gray-900">CareerLens AI</h1>
-            <p className="text-gray-500 mt-2">Sign in to your account</p>
+          <div className="text-center mb-6 sm:mb-8">
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
+              CareerLens AI
+            </h1>
+            <p className="text-sm sm:text-base text-gray-500 mt-2">
+              Sign in to your account
+            </p>
           </div>
 
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+          <form
+            onSubmit={handleSubmit(onSubmit)}
+            className="space-y-5 sm:space-y-6"
+          >
             {error && (
               <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
                 {error}
@@ -51,7 +58,7 @@ export default function Login() {
                   id="email"
                   type="email"
                   {...register("email")}
-                  className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                  className={`w-full pl-10 pr-4 py-3 sm:py-2 text-base sm:text-sm border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
                     errors.email ? "border-red-500" : "border-gray-200"
                   }`}
                   placeholder="you@example.com"
@@ -79,7 +86,7 @@ export default function Login() {
                   id="password"
                   type={showPassword ? "text" : "password"}
                   {...register("password")}
-                  className={`w-full pl-10 pr-12 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                  className={`w-full pl-10 pr-12 py-3 sm:py-2 text-base sm:text-sm border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
                     errors.password ? "border-red-500" : "border-gray-200"
                   }`}
                   placeholder="Enter your password"
@@ -104,7 +111,13 @@ export default function Login() {
               )}
             </div>
 
-            <Button type="submit" disabled={isLoading} fullWidth size="lg">
+            <Button
+              type="submit"
+              disabled={isLoading}
+              fullWidth
+              size="lg"
+              className="py-3 sm:py-2"
+            >
               {isLoading ? "Signing in..." : "Sign in"}
             </Button>
 
