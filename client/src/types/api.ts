@@ -67,7 +67,19 @@ export interface AuthResponse {
   user: {
     id: string;
     email: string;
-    name: string;
+    fullName: string; // Changed from 'name' to 'fullName'
+    role?: string;
+    phone?: string;
+    headline?: string;
+    bio?: string;
+    location?: string;
+    website?: string;
+    linkedin?: string;
+    github?: string;
+    portfolio?: string;
+    skills?: string[];
+    createdAt?: string;
+    updatedAt?: string;
   };
   token: string;
 }

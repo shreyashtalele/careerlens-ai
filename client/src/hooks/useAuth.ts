@@ -4,6 +4,7 @@ import axios, { AxiosError } from "axios";
 import { toast } from "@/lib/toast";
 import { logError } from "@/lib/error-handler";
 import { LoginRequest, RegisterRequest, AuthResponse } from "@/types/api";
+import { useAuthStore } from "@/stores/authStore";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:7000/api";
 
@@ -79,8 +80,11 @@ export function useAuth() {
       localStorage.setItem("token", token);
       localStorage.setItem("user", JSON.stringify(user));
 
+      // Update auth store
+      useAuthStore.getState().setAuth(user, token);
+
       toast.dismiss(toastId);
-      toast.success(`Welcome back, ${user.name || user.email}!`);
+      toast.success(`Welcome back, ${user.fullName || user.email}!`);
       navigate("/dashboard");
       return response.data;
     } catch (err) {

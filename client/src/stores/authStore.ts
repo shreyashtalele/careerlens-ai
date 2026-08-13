@@ -1,6 +1,23 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { User } from "@/types/models";
+
+export interface User {
+  id: string;
+  fullName: string;
+  email: string;
+  role?: string;
+  phone?: string;
+  headline?: string;
+  bio?: string;
+  location?: string;
+  website?: string;
+  linkedin?: string;
+  github?: string;
+  portfolio?: string;
+  skills?: string[];
+  createdAt?: string;
+  updatedAt?: string;
+}
 
 interface AuthState {
   user: User | null;
@@ -20,12 +37,12 @@ export const useAuthStore = create<AuthState>()(
       isAuthenticated: false,
       isLoading: false,
       setAuth: (user, token) => {
-        localStorage.setItem("accessToken", token);
+        localStorage.setItem("token", token);
         set({ user, token, isAuthenticated: true });
       },
       setLoading: (isLoading) => set({ isLoading }),
       logout: () => {
-        localStorage.removeItem("accessToken");
+        localStorage.removeItem("token");
         localStorage.removeItem("user");
         set({ user: null, token: null, isAuthenticated: false });
       },

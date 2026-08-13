@@ -13,7 +13,7 @@ export const apiClient = axios.create({
   timeout: 30000,
 });
 
-// Request interceptor - Add JWT token
+// Request interceptor
 apiClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
     const token = localStorage.getItem("token");
@@ -28,15 +28,21 @@ apiClient.interceptors.request.use(
   },
 );
 
-// Response interceptor - Handle errors
+// Response interceptor - Handle 401
 apiClient.interceptors.response.use(
   (response) => response,
   (error: AxiosError) => {
     const status = error.response?.status;
+    const url = error.config?.url;
 
     logError(error, "API Response");
 
-    if (status === 401) {
+    // If 401 and NOT delete account endpoint, redirect to login
+    if (
+      status === 401 &&
+      !url?.includes("/profile") &&
+      !url?.includes("delete")
+    ) {
       localStorage.removeItem("token");
       localStorage.removeItem("user");
       const isAuthPage = ["/login", "/register"].includes(
@@ -46,6 +52,12 @@ apiClient.interceptors.response.use(
         toast.error("Your session has expired. Please login again.");
         window.location.href = "/login";
       }
+    }
+
+    // For delete account 401, let the component handle it
+    if (status === 401 && url?.includes("/profile")) {
+      // Don't redirect, let the error propagate to the component
+      return Promise.reject(error);
     }
 
     if (status === 403) {
@@ -97,7 +109,6 @@ export const api = {
   },
 };
 
-// Helper to extract error message
 export const getApiErrorMessage = (error: unknown): string => {
   if (axios.isAxiosError(error)) {
     const data = error.response?.data as { message?: string } | undefined;

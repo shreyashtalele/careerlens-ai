@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { profileApi } from "@/api/profile";
 import { Profile, UpdateProfileData } from "@/types/models";
 import { toast } from "@/lib/toast";
 import { logError } from "@/lib/error-handler";
 
 export function useProfile() {
+  const navigate = useNavigate();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -46,26 +48,31 @@ export function useProfile() {
   };
 
   const deleteAccount = async (password: string) => {
+    if (!password || password.length < 6) {
+      toast.error("Please enter a valid password (minimum 6 characters)");
+      throw new Error("Password is required");
+    }
+
     setIsLoading(true);
     setError(null);
     try {
-      await profileApi.deleteAccount(password);
+      const response = await profileApi.deleteAccount(password);
       toast.success("Account deleted successfully");
       localStorage.removeItem("token");
       localStorage.removeItem("user");
-      return true;
-    } catch (err) {
-      const message =
-        err instanceof Error ? err.message : "Failed to delete account";
+      navigate("/login");
+      return response;
+    } catch (err: any) {
+      const message = err.response?.data?.message || "Failed to delete account";
       setError(message);
       toast.error(message);
       logError(err, "Delete Account");
+      // DO NOT navigate here - let the component handle it
       throw err;
     } finally {
       setIsLoading(false);
     }
   };
-
   useEffect(() => {
     fetchProfile();
   }, []);
