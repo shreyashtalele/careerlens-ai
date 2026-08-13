@@ -1,16 +1,17 @@
 import { z } from "zod";
 
-// URL validation - reusable
+// URL validation - allows empty string or valid URL
 const urlSchema = z
   .string()
   .url("Please enter a valid URL")
-  .or(z.string().length(0))
+  .or(z.string().length(0)) // Allow empty string
   .optional();
 
-// Phone validation - reusable
+// Phone validation - allows empty string or valid phone
 const phoneSchema = z
   .string()
   .regex(/^[+]?[\d\s-()]+$/, "Please enter a valid phone number")
+  .or(z.string().length(0)) // Allow empty string
   .optional();
 
 export const profileSchema = z.object({

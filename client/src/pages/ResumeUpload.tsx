@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useUpload } from "@/hooks/useUpload";
 import { Button, Card, CardContent, Badge } from "@/components/ui";
 import { Upload, X, FileCheck, AlertCircle } from "lucide-react";
+import { toast } from "@/lib/toast";
 
 export default function ResumeUpload() {
   const [file, setFile] = useState<File | null>(null);
@@ -46,6 +47,13 @@ export default function ResumeUpload() {
 
   const handleAnalyze = async () => {
     if (!extractedText) {
+      toast.error("No text to analyze. Please upload a resume first.");
+      return;
+    }
+
+    // ✅ Check if JD is empty when toggle is on
+    if (showJDInput && !jobDescription.trim()) {
+      toast.error("Please enter a job description");
       return;
     }
 

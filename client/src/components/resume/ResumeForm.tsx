@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Resume } from "@/types/models";
+import { toast } from "@/lib/toast";
 
 interface ResumeFormProps {
   resume: Resume;
@@ -85,6 +86,18 @@ export function ResumeForm({ resume, onSave, onCancel }: ResumeFormProps) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    // ✅ Add validation
+    if (!formData.title || !formData.title.trim()) {
+      toast.error("Resume title is required");
+      return;
+    }
+
+    if (formData.title.length > 100) {
+      toast.error("Resume title must be less than 100 characters");
+      return;
+    }
+
     onSave(formData);
   };
 

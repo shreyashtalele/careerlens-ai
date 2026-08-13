@@ -74,11 +74,20 @@ export const updateProfile = async (
   return mapUserResponse(user);
 };
 
-export const deleteProfile = async (payload: JwtPayload) => {
-  const user = await User.findById(payload.userId);
+export const deleteProfile = async (payload: JwtPayload, password: string) => {
+  const user = await User.findById(payload.userId).select("+password");
 
   if (!user) {
     throw new ApiError(HTTP_STATUS.NOT_FOUND, AUTH_MESSAGES.USER_NOT_FOUND);
+  }
+
+  const isPasswordValid = await user.comparePassword(password);
+
+  if (!isPasswordValid) {
+    throw new ApiError(
+      HTTP_STATUS.UNAUTHORIZED,
+      "Invalid password. Account deletion failed.",
+    );
   }
 
   await user.deleteOne();

@@ -43,7 +43,9 @@ export const updateProfileController = asyncHandler(
 
 export const deleteProfileController = asyncHandler(
   async (req: Request, res: Response) => {
-    await deleteProfile(req.user!);
+    const { password } = req.body;
+
+    await deleteProfile(req.user!, password);
 
     res
       .status(HTTP_STATUS.OK)

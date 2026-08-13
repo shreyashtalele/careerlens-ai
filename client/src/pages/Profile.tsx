@@ -14,6 +14,7 @@ import {
 import { MapPin, Globe, Link, Edit, Save, X } from "lucide-react";
 import { motion } from "framer-motion";
 import { FadeIn } from "@/components/ui/Animated";
+import { toast } from "@/lib/toast";
 
 export default function Profile() {
   const { profile, isLoading, updateProfile, deleteAccount } = useProfile();
@@ -51,7 +52,13 @@ export default function Profile() {
 
   const onSubmit = async (data: ProfileFormData) => {
     try {
-      await updateProfile(data);
+      const cleanedData = Object.fromEntries(
+        Object.entries(data).map(([key, value]) => [
+          key,
+          value === "" ? undefined : value,
+        ]),
+      );
+      await updateProfile(cleanedData);
       setIsEditing(false);
     } catch (err) {
       // Error handled by hook
@@ -60,14 +67,29 @@ export default function Profile() {
 
   const handleDelete = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!deletePassword) {
+      toast.error("Please enter your password");
+      return;
+    }
+
+    if (deletePassword.length < 6) {
+      toast.error("Password must be at least 6 characters");
+      return;
+    }
+
     try {
       await deleteAccount(deletePassword);
-      window.location.href = "/login";
-    } catch (err) {
-      // Error handled by hook
+      // Only reaches here if successful
+      setShowDeleteConfirm(false);
+      setDeletePassword("");
+      // Hook will navigate to login
+    } catch (err: any) {
+      // Error already handled in hook, just keep modal open
+      console.error("Delete failed:", err);
+      // DO NOT navigate, DO NOT close modal
     }
   };
-
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
@@ -244,7 +266,7 @@ export default function Profile() {
                   </motion.div>
                 )}
 
-                {/* Delete Account */}
+                {/* ✅ FIXED: Delete Account Section */}
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
@@ -444,10 +466,14 @@ export default function Profile() {
         </Card>
       </FadeIn>
 
-      {/* Delete Account Modal */}
+      {/* ✅ FIXED: Delete Account Modal */}
       {showDeleteConfirm && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-2xl p-6 max-w-md w-full">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-white rounded-2xl p-6 max-w-md w-full"
+          >
             <h3 className="text-xl font-semibold text-gray-900 mb-2">
               Delete Account
             </h3>
@@ -464,11 +490,17 @@ export default function Profile() {
                 className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                 required
               />
+              <p className="text-xs text-gray-400 mt-1">
+                Password must be at least 6 characters
+              </p>
               <div className="flex gap-3 mt-4">
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() => setShowDeleteConfirm(false)}
+                  onClick={() => {
+                    setShowDeleteConfirm(false);
+                    setDeletePassword("");
+                  }}
                   className="flex-1"
                 >
                   Cancel
@@ -478,7 +510,7 @@ export default function Profile() {
                 </Button>
               </div>
             </form>
-          </div>
+          </motion.div>
         </div>
       )}
     </div>

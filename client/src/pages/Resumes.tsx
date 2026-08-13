@@ -5,6 +5,7 @@ import { Card, CardContent, Button, Badge } from "@/components/ui";
 import { FileText, Plus, Trash2, Star, Eye } from "lucide-react";
 import { motion } from "framer-motion";
 import { FadeIn, StaggerChildren, StaggerItem } from "@/components/ui/Animated";
+import { toast } from "@/lib/toast";
 
 export default function Resumes() {
   const { resumes, isLoading, deleteResume, setDefault, createResume } =
@@ -18,14 +19,24 @@ export default function Resumes() {
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newTitle.trim()) return;
+
+    // ✅ Add validation
+    if (!newTitle.trim()) {
+      toast.error("Please enter a resume title");
+      return;
+    }
+
+    if (newTitle.length > 100) {
+      toast.error("Resume title must be less than 100 characters");
+      return;
+    }
 
     try {
       const userStr = localStorage.getItem("user");
       const user = userStr ? JSON.parse(userStr) : {};
 
       await createResume({
-        title: newTitle,
+        title: newTitle.trim(),
         personalDetails: {
           fullName: user.fullName || user.name || "",
           email: user.email || "",
@@ -43,7 +54,10 @@ export default function Resumes() {
       });
       setShowCreateForm(false);
       setNewTitle("");
-    } catch (err) {
+      toast.success("Resume created successfully");
+    } catch (err: any) {
+      const message = err.response?.data?.message || "Failed to create resume";
+      toast.error(message);
       console.error("Create failed:", err);
     }
   };

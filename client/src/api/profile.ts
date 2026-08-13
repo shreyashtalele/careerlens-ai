@@ -1,4 +1,5 @@
 import { api } from "./client";
+import { apiClient } from "./client";
 import { Profile, UpdateProfileData } from "@/types/models";
 
 export const profileApi = {
@@ -13,8 +14,10 @@ export const profileApi = {
   deleteAccount: (
     password: string,
   ): Promise<{ success: boolean; message: string }> => {
-    return api.delete<{ success: boolean; message: string }>(
-      `/profile?password=${encodeURIComponent(password)}`,
-    );
+    return apiClient
+      .delete<{ success: boolean; message: string }>("/profile", {
+        data: { password },
+      })
+      .then((response) => response.data);
   },
 };
